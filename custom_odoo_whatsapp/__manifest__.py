@@ -1,5 +1,5 @@
 {
-    "name": "WhatsApp Chatter Integration",
+    "name": "WhatsApp Chatter Integration - Brasil/Brazil",
     "summary": "Adds a WhatsApp conversation panel directly inside the Odoo chatter",
     "description": """
 WhatsApp Chatter Integration
