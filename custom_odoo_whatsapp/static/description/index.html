@@ -4,7 +4,9 @@
     #wa_desc, #wa_desc * { box-sizing: border-box; }
     #wa_desc .wa_card { transition: box-shadow .18s ease, transform .18s ease; }
     #wa_desc .wa_card:hover { box-shadow: 0 6px 20px rgba(17,24,39,.08); transform: translateY(-2px); }
+    #wa_desc .wa_row3 > .wa_card { flex: 1 1 0; min-width: 0; }
     @media (max-width: 767px) {
+      #wa_desc .wa_row3 > .wa_card { flex: 1 1 100% !important; }
       #wa_desc .wa_h1 { font-size: 30px !important; }
       #wa_desc .wa_h2 { font-size: 24px !important; }
       #wa_desc .wa_lead { font-size: 17px !important; }
@@ -55,19 +57,19 @@
         </p>
       </div>
 
-      <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: stretch;">
+      <div class="wa_row3" style="display: flex; flex-wrap: wrap; gap: 20px; align-items: stretch;">
 
-        <div class="wa_card" style="flex: 1 1 300px; background: #ffffff; border: 1px solid #e5e7eb; border-top: 4px solid #25D366; border-radius: 12px; padding: 24px; text-align: left;">
+        <div class="wa_card" style="flex: 1 1 0; min-width: 0; background: #ffffff; border: 1px solid #e5e7eb; border-top: 4px solid #25D366; border-radius: 12px; padding: 24px; text-align: left;">
           <h3 style="margin: 0 0 10px; font-size: 19px; font-weight: 700; color: #714B67;">Odoo Online / SaaS</h3>
           <span style="display: inline-block; background: rgba(37,211,102,.16); color: #128C7E; border-radius: 999px; padding: 3px 11px; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;">Dispon&iacute;vel</span>
         </div>
 
-        <div class="wa_card" style="flex: 1 1 300px; background: #ffffff; border: 1px solid #e5e7eb; border-top: 4px solid #25D366; border-radius: 12px; padding: 24px; text-align: left;">
+        <div class="wa_card" style="flex: 1 1 0; min-width: 0; background: #ffffff; border: 1px solid #e5e7eb; border-top: 4px solid #25D366; border-radius: 12px; padding: 24px; text-align: left;">
           <h3 style="margin: 0 0 10px; font-size: 19px; font-weight: 700; color: #714B67;">Odoo.sh</h3>
           <span style="display: inline-block; background: rgba(37,211,102,.16); color: #128C7E; border-radius: 999px; padding: 3px 11px; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;">Dispon&iacute;vel</span>
         </div>
 
-        <div class="wa_card" style="flex: 1 1 300px; background: #ffffff; border: 1px solid #e5e7eb; border-top: 4px solid #25D366; border-radius: 12px; padding: 24px; text-align: left;">
+        <div class="wa_card" style="flex: 1 1 0; min-width: 0; background: #ffffff; border: 1px solid #e5e7eb; border-top: 4px solid #25D366; border-radius: 12px; padding: 24px; text-align: left;">
           <h3 style="margin: 0 0 10px; font-size: 19px; font-weight: 700; color: #714B67;">On-Premise</h3>
           <span style="display: inline-block; background: rgba(37,211,102,.16); color: #128C7E; border-radius: 999px; padding: 3px 11px; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;">Dispon&iacute;vel</span>
         </div>
@@ -126,10 +128,6 @@
           <h3 style="margin: 0 0 8px; font-size: 19px; font-weight: 700; color: #714B67;">Permiss&otilde;es do Odoo</h3>
           <p style="margin: 0; color: #6b7280; font-size: 15px;">O acesso &agrave;s conversas respeita os grupos e as regras de registro que voc&ecirc; j&aacute; usa no Odoo.</p>
         </div>
-
-      </div>
-    </div>
-  </div>
 
       </div>
     </div>
