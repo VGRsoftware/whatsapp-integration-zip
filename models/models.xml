@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="custom_odoo_zap_field_crm" model="ir.model.fields">
+    <field name="model_id" ref="crm.model_crm_lead" />
+    <field name="name">x_iframe</field>
+    <field name="field_description">Custom Whatsapp</field>
+    <field name="ttype">text</field>
+    <field name="store">false</field>
+    <field name="state">manual</field>
+    <field name="depends">phone,name</field>
+    <field name="compute"><![CDATA[
+for record in self:
+    database_url = record.env['ir.config_parameter'].sudo().get_param('web.base.url')
+    phone = record.phone or ''
+    phone = phone.replace(' ', '').replace('-', '').replace('+', '')
+    url = 'https://whatsapp-odoo.pages.dev/?partner_id=' + str(record.partner_id.id)
+    url = url + '&contact_phone=' + phone
+    url = url + '&odoo_url=' + database_url
+    url = url + '&odoo_user_id=' + str(record.env.user.id)
+    record['x_iframe'] = url
+        ]]>
+        </field>
+  </record>
+  <record id="custom_odoo_zap_field_sale" model="ir.model.fields">
+    <field name="model_id" ref="sale.model_sale_order" />
+    <field name="name">x_iframe</field>
+    <field name="field_description">Custom Whatsapp</field>
+    <field name="ttype">text</field>
+    <field name="store">false</field>
+    <field name="state">manual</field>
+    <field name="depends">partner_id,partner_id.phone</field>
+    <field name="compute"><![CDATA[
+for record in self:
+    database_url = record.env['ir.config_parameter'].sudo().get_param('web.base.url')
+    phone = record.partner_id.phone or ''
+    phone = phone.replace(' ', '').replace('-', '').replace('+', '')
+    url = 'https://whatsapp-odoo.pages.dev/?partner_id=' + str(record.partner_id.id)
+    url = url + '&contact_phone=' + phone
+    url = url + '&odoo_url=' + database_url
+    url = url + '&odoo_user_id=' + str(record.env.user.id)
+    record['x_iframe'] = url
+        ]]>
+        </field>
+  </record>
+</odoo>

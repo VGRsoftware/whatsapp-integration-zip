@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="model_custom_zap_messages" model="ir.model">
+    <field name="name">Zap Messages</field>
+    <field name="model">x_whatsapp_messages</field>
+    <field name="state">manual</field>
+  </record>
+</odoo>

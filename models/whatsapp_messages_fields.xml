@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="field_zap_messages_name" model="ir.model.fields">
+    <field name="model_id" ref="model_custom_zap_messages" />
+    <field name="name">x_name</field>
+    <field name="field_description">Name</field>
+    <field name="ttype">char</field>
+    <field name="required">True</field>
+    <field name="state">manual</field>
+  </record>
+  <record id="field_zap_messages_date" model="ir.model.fields">
+    <field name="model_id" ref="model_custom_zap_messages" />
+    <field name="name">x_date</field>
+    <field name="field_description">Date</field>
+    <field name="ttype">datetime</field>
+    <field name="required">True</field>
+    <field name="state">manual</field>
+  </record>
+  <record id="field_zap_messages_direction" model="ir.model.fields">
+    <field name="model_id" ref="model_custom_zap_messages" />
+    <field name="name">x_direction</field>
+    <field name="field_description">Direction</field>
+    <field name="ttype">selection</field>
+    <field name="required">True</field>
+    <field name="state">manual</field>
+  </record>
+  <record id="field_zap_messages_direction_in" model="ir.model.fields.selection">
+    <field name="field_id" ref="field_zap_messages_direction" />
+    <field name="name">in</field>
+    <field name="value">in</field>
+    <field name="sequence">10</field>
+  </record>
+  <record id="field_zap_messages_direction_out" model="ir.model.fields.selection">
+    <field name="field_id" ref="field_zap_messages_direction" />
+    <field name="name">out</field>
+    <field name="value">out</field>
+    <field name="sequence">20</field>
+  </record>
+  <record id="field_zap_messages_jid" model="ir.model.fields">
+    <field name="model_id" ref="model_custom_zap_messages" />
+    <field name="name">x_jid</field>
+    <field name="field_description">jid</field>
+    <field name="ttype">char</field>
+    <field name="required">True</field>
+    <field name="state">manual</field>
+  </record>
+  <record id="field_zap_messages_message" model="ir.model.fields">
+    <field name="model_id" ref="model_custom_zap_messages" />
+    <field name="name">x_message</field>
+    <field name="field_description">text</field>
+    <field name="ttype">text</field>
+    <field name="required">True</field>
+    <field name="state">manual</field>
+  </record>
+  <record id="field_zap_messages_status" model="ir.model.fields">
+    <field name="model_id" ref="model_custom_zap_messages" />
+    <field name="name">x_status</field>
+    <field name="field_description">char</field>
+    <field name="ttype">char</field>
+    <field name="required">False</field>
+    <field name="state">manual</field>
+  </record>
+  <!-- Char, NOT a relation. Cross-database (stores HUB seat x_session_id). -->
+  <record id="field_zap_messages_zap_number" model="ir.model.fields">
+    <field name="model_id" ref="model_custom_zap_messages" />
+    <field name="name">x_zap_number</field>
+    <field name="field_description">char</field>
+    <field name="ttype">char</field>
+    <field name="required">False</field>
+    <field name="state">manual</field>
+  </record>
+</odoo>

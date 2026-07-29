@@ -1,0 +1,3 @@
+0000000000000000000000000000000000000000 df4f43524f65e8747f377e0326937ab2fc29e25d rodm-odoo <rodm@odoo.com> 1784483503 -0300	commit (initial): default application setup
+df4f43524f65e8747f377e0326937ab2fc29e25d 26673d6392f0e194b0c876b246c832f1813a390f rodm-odoo <rodm@odoo.com> 1784484359 -0300	commit: fix: module name and references
+26673d6392f0e194b0c876b246c832f1813a390f fa4d9407861fe8fb2137e1bf417212cc05366839 Victor Tomazoni Renaud <153289221+VitoVito25@users.noreply.github.com> 1785340912 -0300	commit: Initial commit

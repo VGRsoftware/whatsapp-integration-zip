@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+
+  <t t-name="mail.Chatter" t-inherit="mail.Chatter" t-inherit-mode="extension">
+
+
+    <xpath expr="//div[hasclass('o-mail-Chatter-top')]" position="attributes">
+      <attribute name="t-ref">chatterTop</attribute>
+    </xpath>
+
+    <xpath expr="//div[hasclass('o-mail-Chatter-content')]" position="attributes">
+      <attribute name="t-ref">chatterContent</attribute>
+    </xpath>
+
+    <xpath expr="//div[hasclass('o-mail-Chatter-top')]" position="before">
+      <t t-if="props.record.resModel == 'crm.lead' || props.record.resModel == 'sale.order'">
+        <div class="o-chatter-zap-toggle d-flex mx-2 mt-2">
+
+          <button t-ref="chatter-btn"
+            class="btn flex-fill btn-secondary o_zap_btn_chatter"
+            t-on-click="() => this.zapToggle('chatter')"
+          >Chatter</button>
+          <button t-ref="zap-btn"
+            class="btn flex-fill btn-primary o_zap_btn_iframe"
+            t-on-click="() => this.zapToggle('zap')"
+          >WhatsApp</button>
+        </div>
+
+        <div t-ref="zap" class="hidden px-2 pb-2 mt-2"
+          style="width:100%; height:100%; min-height: 500px; overflow:hidden;">
+          <iframe t-att-src="props.record.data.x_iframe"
+            style="width:100%; min-height: 600px; height:100%; border-radius:6px; border: #262A36 solid 1px" />
+        </div>
+      </t>
+    </xpath>
+
+  </t>
+
+</templates>
