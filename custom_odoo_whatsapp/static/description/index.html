@@ -1,107 +1,118 @@
+<!--
+  Odoo Apps Store sanitiza esta descricao no servidor. Restricoes confirmadas na pagina publicada:
+    - a tag <style> e removida por completo: nenhuma classe CSS, nenhum :hover, nenhuma media query funciona.
+    - o atributo style passa por whitelist de propriedades longhand. Sobrevivem: border*, border-spacing,
+      color, display, font-*, padding-*, margin-*, width, height, max-width, min-width, line-height,
+      text-align, text-decoration, text-transform, vertical-align, letter-spacing, background-color.
+      Sao removidas: background (shorthand), flex, flex-wrap, gap, justify-content, align-items,
+      box-sizing, box-shadow, transition, transform, position.
+    - links: apenas apps.odoo.com, www.youtube.com e mailto: continuam como <a>. Qualquer outro dominio
+      e convertido em <span href="...">, o texto fica mas o link morre.
+  Por isso o layout usa <table> com border-spacing em vez de flexbox, background-color em vez de
+  background, e todo o estilo vive inline. Manter esse padrao ao editar.
+-->
 <section id="wa_desc" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #1f2937; line-height: 1.6; font-size: 16px;">
 
   <style>
-    #wa_desc, #wa_desc * { box-sizing: border-box; }
-    #wa_desc .wa_card { transition: box-shadow .18s ease, transform .18s ease; }
-    #wa_desc .wa_card:hover { box-shadow: 0 6px 20px rgba(17,24,39,.08); transform: translateY(-2px); }
-    #wa_desc .wa_row3 > .wa_card { flex: 1 1 0; min-width: 0; }
-    #wa_desc .wa_row3f > .wa_card { flex: 1 1 calc(33.333% - 14px); min-width: 0; }
-    #wa_desc .wa_link { color: #128C7E; font-weight: 600; text-decoration: none; border-bottom: 1px solid rgba(18,140,126,.35); transition: color .18s ease, border-color .18s ease; }
+    /* Ignorado pelo Apps Store (a tag e removida). Vale so onde o HTML e servido cru. */
+    #wa_desc .wa_link { text-decoration: none; border-bottom: 1px solid rgba(18,140,126,.35); transition: color .18s ease, border-color .18s ease; }
     #wa_desc .wa_link:hover, #wa_desc .wa_link:focus { color: #714B67; border-bottom-color: #714B67; }
+    #wa_desc .wa_card { transition: border-color .18s ease; }
+    #wa_desc .wa_card:hover { border-color: #25D366; }
     @media (max-width: 767px) {
-      #wa_desc .wa_row3 > .wa_card,
-      #wa_desc .wa_row3f > .wa_card { flex: 1 1 100% !important; }
       #wa_desc .wa_h1 { font-size: 30px !important; }
       #wa_desc .wa_h2 { font-size: 24px !important; }
       #wa_desc .wa_lead { font-size: 17px !important; }
-      #wa_desc .wa_section { padding: 40px 0 !important; }
-      #wa_desc .wa_wrap { padding: 0 16px !important; }
+      #wa_desc .wa_col { display: block !important; width: 100% !important; }
     }
   </style>
 
   <!-- ================= HERO ================= -->
-  <div class="wa_section" style="padding: 56px 0; text-align: center;">
-    <div class="wa_wrap" style="box-sizing: border-box; max-width: 1140px; margin: 0 auto; padding: 0 24px;">
-      <h1 class="wa_h1" style="margin: 0 0 14px; font-size: 42px; line-height: 1.15; font-weight: 700; color: #714B67;">
+  <div class="wa_section" style="padding-top: 56px; padding-bottom: 56px; text-align: center;">
+    <div class="wa_wrap" style="max-width: 1140px; margin-left: auto; margin-right: auto; padding-left: 24px; padding-right: 24px;">
+      <h1 class="wa_h1" style="margin-top: 0; margin-bottom: 14px; font-size: 42px; line-height: 1.15; font-weight: 700; color: #714B67;">
         O WhatsApp da sua equipe, dentro do Odoo SAAS
       </h1>
-      <p class="wa_lead" style="margin: 0 auto; max-width: 720px; font-size: 20px; color: #6b7280;">
+      <p class="wa_lead" style="margin-top: 0; margin-bottom: 0; margin-left: auto; margin-right: auto; max-width: 720px; font-size: 20px; color: #6b7280;">
         Atenda pelo WhatsApp sem sair do Odoo. Sem perder o n&uacute;mero e sem custo por mensagem.
       </p>
 
-      <div style="margin-top: 26px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
-        <span style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 999px; padding: 7px 16px; font-size: 14px; font-weight: 600; color: #714B67;">&#10003;&nbsp; Odoo SAAS</span>
-        <span style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 999px; padding: 7px 16px; font-size: 14px; font-weight: 600; color: #714B67;">&#10003;&nbsp; Odoo 19.0</span>
-        <span style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 999px; padding: 7px 16px; font-size: 14px; font-weight: 600; color: #714B67;">&#10003;&nbsp; Feito para o Brasil</span>
-        <span style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 999px; padding: 7px 16px; font-size: 14px; font-weight: 600; color: #714B67;">&#10003;&nbsp; N&atilde;o perde o n&uacute;mero</span>
-        <span style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 999px; padding: 7px 16px; font-size: 14px; font-weight: 600; color: #714B67;">&#10003;&nbsp; Nativo no CRM e Vendas</span>
-        <span style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 999px; padding: 7px 16px; font-size: 14px; font-weight: 600; color: #714B67;">&#10003;&nbsp; Sem sair do Odoo</span>
+      <div style="margin-top: 22px;">
+        <span style="display: inline-block; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 999px; padding-top: 7px; padding-bottom: 7px; padding-left: 16px; padding-right: 16px; margin-top: 5px; margin-bottom: 5px; margin-left: 4px; margin-right: 4px; font-size: 14px; font-weight: 600; color: #714B67;">&#10003;&nbsp; Odoo SAAS</span>
+        <span style="display: inline-block; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 999px; padding-top: 7px; padding-bottom: 7px; padding-left: 16px; padding-right: 16px; margin-top: 5px; margin-bottom: 5px; margin-left: 4px; margin-right: 4px; font-size: 14px; font-weight: 600; color: #714B67;">&#10003;&nbsp; Odoo 19.0</span>
+        <span style="display: inline-block; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 999px; padding-top: 7px; padding-bottom: 7px; padding-left: 16px; padding-right: 16px; margin-top: 5px; margin-bottom: 5px; margin-left: 4px; margin-right: 4px; font-size: 14px; font-weight: 600; color: #714B67;">&#10003;&nbsp; Feito para o Brasil</span>
+        <span style="display: inline-block; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 999px; padding-top: 7px; padding-bottom: 7px; padding-left: 16px; padding-right: 16px; margin-top: 5px; margin-bottom: 5px; margin-left: 4px; margin-right: 4px; font-size: 14px; font-weight: 600; color: #714B67;">&#10003;&nbsp; N&atilde;o perde o n&uacute;mero</span>
+        <span style="display: inline-block; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 999px; padding-top: 7px; padding-bottom: 7px; padding-left: 16px; padding-right: 16px; margin-top: 5px; margin-bottom: 5px; margin-left: 4px; margin-right: 4px; font-size: 14px; font-weight: 600; color: #714B67;">&#10003;&nbsp; Nativo no CRM e Vendas</span>
+        <span style="display: inline-block; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 999px; padding-top: 7px; padding-bottom: 7px; padding-left: 16px; padding-right: 16px; margin-top: 5px; margin-bottom: 5px; margin-left: 4px; margin-right: 4px; font-size: 14px; font-weight: 600; color: #714B67;">&#10003;&nbsp; Sem sair do Odoo</span>
       </div>
     </div>
   </div>
 
   <!-- ================= BANNER ================= -->
-  <div class="wa_wrap" style="box-sizing: border-box; max-width: 1140px; margin: 0 auto; padding: 0 24px 56px;">
+  <div class="wa_wrap" style="max-width: 1140px; margin-left: auto; margin-right: auto; padding-left: 24px; padding-right: 24px; padding-bottom: 56px;">
     <img src="banner_index.png"
          alt="WhatsApp no Odoo SAAS - painel de conversa dentro do chatter do CRM"
          style="display: block; width: 100%; max-width: 100%; height: auto; border-radius: 12px; border: 1px solid #e5e7eb;"/>
   </div>
 
-  <div class="wa_section" style="padding: 56px 0; text-align: center;">
-    <div class="wa_wrap" style="box-sizing: border-box; max-width: 1140px; margin: 0 auto; padding: 0 24px;">
-      <h2 class="wa_h2" style="margin: 0 0 12px; font-size: 30px; line-height: 1.2; font-weight: 700; color: #714B67;">
+  <!-- ================= JA INSTALOU ================= -->
+  <div class="wa_section" style="padding-top: 48px; padding-bottom: 48px; text-align: center; background-color: #f7f7f9;">
+    <div class="wa_wrap" style="max-width: 1140px; margin-left: auto; margin-right: auto; padding-left: 24px; padding-right: 24px;">
+      <h2 class="wa_h2" style="margin-top: 0; margin-bottom: 12px; font-size: 30px; line-height: 1.2; font-weight: 700; color: #714B67;">
         J&aacute; instalou o m&oacute;dulo?
       </h2>
-      <p class="wa_lead" style="margin: 0 auto 20px; max-width: 640px; font-size: 20px; color: #714B67;">
-        Acesse o link do <a class="wa_link" href="https://edu-hub-integracoes.odoo.com/" target="_blank" rel="noopener noreferrer">hub de integra&ccedil;&atilde;o</a> para adquirir o seu assento e come&ccedil;ar a falar
+      <p class="wa_lead" style="margin-top: 0; margin-bottom: 16px; margin-left: auto; margin-right: auto; max-width: 640px; font-size: 20px; color: #714B67;">
+        Acesse o hub de integra&ccedil;&atilde;o para adquirir o seu assento e come&ccedil;ar a falar:
       </p>
-      <p style="margin: 0; font-size: 15px; color: #714B67;">
-        Ou assista o <a class="wa_link" href="#" target="_blank" rel="noopener noreferrer">v&iacute;deo explicativo</a> para entender como a plataforma funciona
+      <p style="margin-top: 0; margin-bottom: 22px;">
+        <a class="wa_link" href="https://edu-hub-integracoes.odoo.com/"
+           style="display: inline-block; background-color: #ffffff; border: 1px solid #25D366; border-radius: 999px; padding-top: 11px; padding-bottom: 11px; padding-left: 26px; padding-right: 26px; font-size: 18px; font-weight: 700; color: #128C7E; text-decoration: none;">edu-hub-integracoes.odoo.com</a>
+      </p>
+      <p style="margin-top: 0; margin-bottom: 0; font-size: 15px; color: #6b7280;">
+        Ou assista o <a class="wa_link" href="#" style="color: #128C7E; font-weight: 600; text-decoration: underline;">v&iacute;deo explicativo</a> para entender como a plataforma funciona.
       </p>
     </div>
   </div>
 
   <!-- ================= DISPONIBILIDADE ================= -->
-  <div class="wa_section" style="padding: 56px 0; background: #f7f7f9;">
-    <div class="wa_wrap" style="box-sizing: border-box; max-width: 1140px; margin: 0 auto; padding: 0 24px;">
+  <div class="wa_section" style="padding-top: 56px; padding-bottom: 56px;">
+    <div class="wa_wrap" style="max-width: 1140px; margin-left: auto; margin-right: auto; padding-left: 24px; padding-right: 24px;">
 
       <div style="text-align: center;">
-        <div style="width: 64px; height: 3px; background: #25D366; margin: 0 auto 22px;"></div>
-        <h2 class="wa_h2" style="margin: 0 0 12px; font-size: 30px; line-height: 1.2; font-weight: 700; color: #714B67;">
+        <div style="width: 64px; height: 3px; background-color: #25D366; margin-left: auto; margin-right: auto; margin-bottom: 22px;"></div>
+        <h2 class="wa_h2" style="margin-top: 0; margin-bottom: 12px; font-size: 30px; line-height: 1.2; font-weight: 700; color: #714B67;">
           Dispon&iacute;vel em qualquer hospedagem Odoo
         </h2>
-        <p class="wa_lead" style="margin: 0 auto 32px; max-width: 700px; font-size: 20px; color: #6b7280;">
+        <p class="wa_lead" style="margin-top: 0; margin-bottom: 28px; margin-left: auto; margin-right: auto; max-width: 700px; font-size: 20px; color: #6b7280;">
           SaaS, Odoo.sh ou servidor pr&oacute;prio &mdash; a integra&ccedil;&atilde;o roda igual nos tr&ecirc;s.
         </p>
       </div>
 
-      <div class="wa_row3" style="display: flex; flex-wrap: wrap; gap: 20px; align-items: stretch;">
-
-        <div class="wa_card" style="flex: 1 1 0; min-width: 0; background: #ffffff; border: 1px solid #e5e7eb; border-top: 4px solid #25D366; border-radius: 12px; padding: 24px; text-align: left;">
-          <h3 style="margin: 0 0 10px; font-size: 19px; font-weight: 700; color: #714B67;">Odoo Online / SaaS</h3>
-          <span style="display: inline-block; background: rgba(37,211,102,.16); color: #128C7E; border-radius: 999px; padding: 3px 11px; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;">Dispon&iacute;vel</span>
-        </div>
-
-        <div class="wa_card" style="flex: 1 1 0; min-width: 0; background: #ffffff; border: 1px solid #e5e7eb; border-top: 4px solid #25D366; border-radius: 12px; padding: 24px; text-align: left;">
-          <h3 style="margin: 0 0 10px; font-size: 19px; font-weight: 700; color: #714B67;">Odoo.sh</h3>
-          <span style="display: inline-block; background: rgba(37,211,102,.16); color: #128C7E; border-radius: 999px; padding: 3px 11px; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;">Dispon&iacute;vel</span>
-        </div>
-
-        <div class="wa_card" style="flex: 1 1 0; min-width: 0; background: #ffffff; border: 1px solid #e5e7eb; border-top: 4px solid #25D366; border-radius: 12px; padding: 24px; text-align: left;">
-          <h3 style="margin: 0 0 10px; font-size: 19px; font-weight: 700; color: #714B67;">On-Premise</h3>
-          <span style="display: inline-block; background: rgba(37,211,102,.16); color: #128C7E; border-radius: 999px; padding: 3px 11px; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;">Dispon&iacute;vel</span>
-        </div>
-
-      </div>
-
-      <table style="width: 100%; border-collapse: collapse; margin-top: 28px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px;">
+      <table style="width: 100%; border-collapse: separate; border-spacing: 10px;">
         <tr>
-          <th style="text-align: left; padding: 13px 16px; border-bottom: 1px solid #e5e7eb; background: #f7f7f9; color: #714B67; font-weight: 700; font-size: 15px;">Depend&ecirc;ncias</th>
-          <td style="text-align: left; padding: 13px 16px; border-bottom: 1px solid #e5e7eb; font-size: 15px;"><code style="background: #f3f4f6; padding: 2px 6px; border-radius: 4px;">crm</code>, <code style="background: #f3f4f6; padding: 2px 6px; border-radius: 4px;">sale_management</code> &mdash; sem bibliotecas Python externas</td>
+          <td class="wa_col wa_card" style="width: 33.33%; vertical-align: top; background-color: #ffffff; border: 1px solid #e5e7eb; border-top: 4px solid #25D366; border-radius: 12px; padding-top: 24px; padding-bottom: 24px; padding-left: 24px; padding-right: 24px; text-align: left;">
+            <h3 style="margin-top: 0; margin-bottom: 10px; font-size: 19px; font-weight: 700; color: #714B67;">Odoo Online / SaaS</h3>
+            <span style="display: inline-block; background-color: #e7f9ee; color: #128C7E; border-radius: 999px; padding-top: 3px; padding-bottom: 3px; padding-left: 11px; padding-right: 11px; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;">Dispon&iacute;vel</span>
+          </td>
+          <td class="wa_col wa_card" style="width: 33.33%; vertical-align: top; background-color: #ffffff; border: 1px solid #e5e7eb; border-top: 4px solid #25D366; border-radius: 12px; padding-top: 24px; padding-bottom: 24px; padding-left: 24px; padding-right: 24px; text-align: left;">
+            <h3 style="margin-top: 0; margin-bottom: 10px; font-size: 19px; font-weight: 700; color: #714B67;">Odoo.sh</h3>
+            <span style="display: inline-block; background-color: #e7f9ee; color: #128C7E; border-radius: 999px; padding-top: 3px; padding-bottom: 3px; padding-left: 11px; padding-right: 11px; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;">Dispon&iacute;vel</span>
+          </td>
+          <td class="wa_col wa_card" style="width: 33.33%; vertical-align: top; background-color: #ffffff; border: 1px solid #e5e7eb; border-top: 4px solid #25D366; border-radius: 12px; padding-top: 24px; padding-bottom: 24px; padding-left: 24px; padding-right: 24px; text-align: left;">
+            <h3 style="margin-top: 0; margin-bottom: 10px; font-size: 19px; font-weight: 700; color: #714B67;">On-Premise</h3>
+            <span style="display: inline-block; background-color: #e7f9ee; color: #128C7E; border-radius: 999px; padding-top: 3px; padding-bottom: 3px; padding-left: 11px; padding-right: 11px; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;">Dispon&iacute;vel</span>
+          </td>
+        </tr>
+      </table>
+
+      <table style="width: 100%; border-collapse: collapse; margin-top: 22px; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px;">
+        <tr>
+          <th style="text-align: left; vertical-align: top; padding-top: 13px; padding-bottom: 13px; padding-left: 16px; padding-right: 16px; border-bottom: 1px solid #e5e7eb; background-color: #f7f7f9; color: #714B67; font-weight: 700; font-size: 15px;">Depend&ecirc;ncias</th>
+          <td style="text-align: left; vertical-align: top; padding-top: 13px; padding-bottom: 13px; padding-left: 16px; padding-right: 16px; border-bottom: 1px solid #e5e7eb; font-size: 15px;"><code style="background-color: #f3f4f6; padding-left: 6px; padding-right: 6px; border-radius: 4px;">crm</code>, <code style="background-color: #f3f4f6; padding-left: 6px; padding-right: 6px; border-radius: 4px;">sale_management</code> &mdash; sem bibliotecas Python externas</td>
         </tr>
         <tr>
-          <th style="text-align: left; padding: 13px 16px; background: #f7f7f9; color: #714B67; font-weight: 700; font-size: 15px;">Custo por mensagem</th>
-          <td style="text-align: left; padding: 13px 16px; font-size: 15px;">Nenhum. Voc&ecirc; usa o seu pr&oacute;prio n&uacute;mero.</td>
+          <th style="text-align: left; vertical-align: top; padding-top: 13px; padding-bottom: 13px; padding-left: 16px; padding-right: 16px; background-color: #f7f7f9; color: #714B67; font-weight: 700; font-size: 15px;">Custo por mensagem</th>
+          <td style="text-align: left; vertical-align: top; padding-top: 13px; padding-bottom: 13px; padding-left: 16px; padding-right: 16px; font-size: 15px;">Nenhum. Voc&ecirc; usa o seu pr&oacute;prio n&uacute;mero.</td>
         </tr>
       </table>
 
@@ -109,91 +120,88 @@
   </div>
 
   <!-- ================= RECURSOS ================= -->
-  <div class="wa_section" style="padding: 56px 0;">
-    <div class="wa_wrap" style="box-sizing: border-box; max-width: 1140px; margin: 0 auto; padding: 0 24px;">
+  <div class="wa_section" style="padding-top: 56px; padding-bottom: 56px; background-color: #f7f7f9;">
+    <div class="wa_wrap" style="max-width: 1140px; margin-left: auto; margin-right: auto; padding-left: 24px; padding-right: 24px;">
 
-      <div style="width: 64px; height: 3px; background: #25D366; margin: 0 0 22px;"></div>
-      <h2 class="wa_h2" style="margin: 0 0 12px; font-size: 30px; line-height: 1.2; font-weight: 700; color: #714B67;">
+      <div style="width: 64px; height: 3px; background-color: #25D366; margin-bottom: 22px;"></div>
+      <h2 class="wa_h2" style="margin-top: 0; margin-bottom: 12px; font-size: 30px; line-height: 1.2; font-weight: 700; color: #714B67;">
         O que o m&oacute;dulo faz
       </h2>
-      <p class="wa_lead" style="margin: 0 0 32px; max-width: 720px; font-size: 20px; color: #6b7280;">
+      <p class="wa_lead" style="margin-top: 0; margin-bottom: 28px; max-width: 720px; font-size: 20px; color: #6b7280;">
         Uma aba a mais no chatter. Nada de segunda tela, nada de copiar e colar.
       </p>
 
-      <div class="wa_row3f" style="display: flex; flex-wrap: wrap; gap: 20px; align-items: stretch;">
-
-        <div class="wa_card" style="flex: 1 1 calc(33.333% - 14px); min-width: 0; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px;">
-          <h3 style="margin: 0 0 8px; font-size: 19px; font-weight: 700; color: #714B67;">Chatter e WhatsApp na mesma tela</h3>
-          <p style="margin: 0; color: #6b7280; font-size: 15px;">Alterne entre o chatter padr&atilde;o do Odoo e a conversa de WhatsApp com um clique, sem sair do registro.</p>
-        </div>
-
-        <div class="wa_card" style="flex: 1 1 calc(33.333% - 14px); min-width: 0; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px;">
-          <h3 style="margin: 0 0 8px; font-size: 19px; font-weight: 700; color: #714B67;">Hist&oacute;rico dentro do documento</h3>
-          <p style="margin: 0; color: #6b7280; font-size: 15px;">As mensagens ficam vinculadas &agrave; oportunidade, ao cliente ou &agrave; cota&ccedil;&atilde;o &mdash; o contexto n&atilde;o se perde.</p>
-        </div>
-
-        <div class="wa_card" style="flex: 1 1 calc(33.333% - 14px); min-width: 0; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px;">
-          <h3 style="margin: 0 0 8px; font-size: 19px; font-weight: 700; color: #714B67;">Seu n&uacute;mero continua seu</h3>
-          <p style="margin: 0; color: #6b7280; font-size: 15px;">Sem migra&ccedil;&atilde;o de n&uacute;mero, sem n&uacute;mero virtual novo, sem perder o hist&oacute;rico da equipe.</p>
-        </div>
-
-        <div class="wa_card" style="flex: 1 1 calc(33.333% - 14px); min-width: 0; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px;">
-          <h3 style="margin: 0 0 8px; font-size: 19px; font-weight: 700; color: #714B67;">Feito para o Brasil</h3>
-          <p style="margin: 0; color: #6b7280; font-size: 15px;">Interface em portugu&ecirc;s e tratamento correto de n&uacute;meros brasileiros, com e sem o nono d&iacute;gito.</p>
-        </div>
-
-        <div class="wa_card" style="flex: 1 1 calc(33.333% - 14px); min-width: 0; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px;">
-          <h3 style="margin: 0 0 8px; font-size: 19px; font-weight: 700; color: #714B67;">Permiss&otilde;es do Odoo</h3>
-          <p style="margin: 0; color: #6b7280; font-size: 15px;">O acesso &agrave;s conversas respeita os grupos e as regras de registro que voc&ecirc; j&aacute; usa no Odoo.</p>
-        </div>
-
-      </div>
+      <table style="width: 100%; border-collapse: separate; border-spacing: 10px;">
+        <tr>
+          <td class="wa_col wa_card" style="width: 33.33%; vertical-align: top; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding-top: 24px; padding-bottom: 24px; padding-left: 24px; padding-right: 24px;">
+            <h3 style="margin-top: 0; margin-bottom: 8px; font-size: 19px; font-weight: 700; color: #714B67;">Chatter e WhatsApp na mesma tela</h3>
+            <p style="margin-top: 0; margin-bottom: 0; color: #6b7280; font-size: 15px;">Alterne entre o chatter padr&atilde;o do Odoo e a conversa de WhatsApp com um clique, sem sair do registro.</p>
+          </td>
+          <td class="wa_col wa_card" style="width: 33.33%; vertical-align: top; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding-top: 24px; padding-bottom: 24px; padding-left: 24px; padding-right: 24px;">
+            <h3 style="margin-top: 0; margin-bottom: 8px; font-size: 19px; font-weight: 700; color: #714B67;">Hist&oacute;rico dentro do documento</h3>
+            <p style="margin-top: 0; margin-bottom: 0; color: #6b7280; font-size: 15px;">As mensagens ficam vinculadas &agrave; oportunidade, ao cliente ou &agrave; cota&ccedil;&atilde;o &mdash; o contexto n&atilde;o se perde.</p>
+          </td>
+          <td class="wa_col wa_card" style="width: 33.33%; vertical-align: top; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding-top: 24px; padding-bottom: 24px; padding-left: 24px; padding-right: 24px;">
+            <h3 style="margin-top: 0; margin-bottom: 8px; font-size: 19px; font-weight: 700; color: #714B67;">Seu n&uacute;mero continua seu</h3>
+            <p style="margin-top: 0; margin-bottom: 0; color: #6b7280; font-size: 15px;">Sem migra&ccedil;&atilde;o de n&uacute;mero, sem n&uacute;mero virtual novo, sem perder o hist&oacute;rico da equipe.</p>
+          </td>
+        </tr>
+        <tr>
+          <td class="wa_col wa_card" style="width: 33.33%; vertical-align: top; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding-top: 24px; padding-bottom: 24px; padding-left: 24px; padding-right: 24px;">
+            <h3 style="margin-top: 0; margin-bottom: 8px; font-size: 19px; font-weight: 700; color: #714B67;">Feito para o Brasil</h3>
+            <p style="margin-top: 0; margin-bottom: 0; color: #6b7280; font-size: 15px;">Interface em portugu&ecirc;s e tratamento correto de n&uacute;meros brasileiros, com e sem o nono d&iacute;gito.</p>
+          </td>
+          <td class="wa_col wa_card" style="width: 33.33%; vertical-align: top; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding-top: 24px; padding-bottom: 24px; padding-left: 24px; padding-right: 24px;">
+            <h3 style="margin-top: 0; margin-bottom: 8px; font-size: 19px; font-weight: 700; color: #714B67;">Permiss&otilde;es do Odoo</h3>
+            <p style="margin-top: 0; margin-bottom: 0; color: #6b7280; font-size: 15px;">O acesso &agrave;s conversas respeita os grupos e as regras de registro que voc&ecirc; j&aacute; usa no Odoo.</p>
+          </td>
+          <td class="wa_col" style="width: 33.33%;"></td>
+        </tr>
+      </table>
     </div>
   </div>
 
   <!-- ================= PASSOS ================= -->
-  <div class="wa_section" style="padding: 56px 0;">
-    <div class="wa_wrap" style="box-sizing: border-box; max-width: 1140px; margin: 0 auto; padding: 0 24px;">
+  <div class="wa_section" style="padding-top: 56px; padding-bottom: 56px;">
+    <div class="wa_wrap" style="max-width: 1140px; margin-left: auto; margin-right: auto; padding-left: 24px; padding-right: 24px;">
 
-      <div style="width: 64px; height: 3px; background: #25D366; margin: 0 0 22px;"></div>
-      <h2 class="wa_h2" style="margin: 0 0 32px; font-size: 30px; line-height: 1.2; font-weight: 700; color: #714B67;">
+      <div style="width: 64px; height: 3px; background-color: #25D366; margin-bottom: 22px;"></div>
+      <h2 class="wa_h2" style="margin-top: 0; margin-bottom: 28px; font-size: 30px; line-height: 1.2; font-weight: 700; color: #714B67;">
         Tr&ecirc;s passos. Fale para sempre.
       </h2>
 
-      <div class="wa_row3" style="display: flex; flex-wrap: wrap; gap: 20px; align-items: stretch;">
-
-        <div class="wa_card" style="flex: 1 1 0; min-width: 0; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px;">
-          <div style="width: 40px; height: 40px; line-height: 40px; text-align: center; border-radius: 50%; background: #714B67; color: #ffffff; font-weight: 700; font-size: 17px; margin-bottom: 14px;">1</div>
-          <h3 style="margin: 0 0 8px; font-size: 19px; font-weight: 700; color: #714B67;">Instale o m&oacute;dulo</h3>
-          <p style="margin: 0; color: #6b7280; font-size: 15px;">Um clique em Aplicativos, no SaaS, no Odoo.sh ou no seu servidor. Sem depend&ecirc;ncia externa.</p>
-        </div>
-
-        <div class="wa_card" style="flex: 1 1 0; min-width: 0; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px;">
-          <div style="width: 40px; height: 40px; line-height: 40px; text-align: center; border-radius: 50%; background: #714B67; color: #ffffff; font-weight: 700; font-size: 17px; margin-bottom: 14px;">2</div>
-          <h3 style="margin: 0 0 8px; font-size: 19px; font-weight: 700; color: #714B67;">Conecte o n&uacute;mero</h3>
-          <p style="margin: 0; color: #6b7280; font-size: 15px;">Aponte o n&uacute;mero que sua equipe j&aacute; usa. Sem migra&ccedil;&atilde;o.</p>
-        </div>
-
-        <div class="wa_card" style="flex: 1 1 0; min-width: 0; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px;">
-          <div style="width: 40px; height: 40px; line-height: 40px; text-align: center; border-radius: 50%; background: #714B67; color: #ffffff; font-weight: 700; font-size: 17px; margin-bottom: 14px;">3</div>
-          <h3 style="margin: 0 0 8px; font-size: 19px; font-weight: 700; color: #714B67;">Atenda no Odoo</h3>
-          <p style="margin: 0; color: #6b7280; font-size: 15px;">Abra qualquer lead ou cota&ccedil;&atilde;o e a aba WhatsApp j&aacute; est&aacute; l&aacute;, com a conversa toda.</p>
-        </div>
-
-      </div>
+      <table style="width: 100%; border-collapse: separate; border-spacing: 10px;">
+        <tr>
+          <td class="wa_col wa_card" style="width: 33.33%; vertical-align: top; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding-top: 24px; padding-bottom: 24px; padding-left: 24px; padding-right: 24px;">
+            <div style="width: 40px; height: 40px; line-height: 40px; text-align: center; border-radius: 999px; background-color: #714B67; color: #ffffff; font-weight: 700; font-size: 17px; margin-bottom: 14px;">1</div>
+            <h3 style="margin-top: 0; margin-bottom: 8px; font-size: 19px; font-weight: 700; color: #714B67;">Instale o m&oacute;dulo</h3>
+            <p style="margin-top: 0; margin-bottom: 0; color: #6b7280; font-size: 15px;">Um clique em Aplicativos, no SaaS, no Odoo.sh ou no seu servidor. Sem depend&ecirc;ncia externa.</p>
+          </td>
+          <td class="wa_col wa_card" style="width: 33.33%; vertical-align: top; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding-top: 24px; padding-bottom: 24px; padding-left: 24px; padding-right: 24px;">
+            <div style="width: 40px; height: 40px; line-height: 40px; text-align: center; border-radius: 999px; background-color: #714B67; color: #ffffff; font-weight: 700; font-size: 17px; margin-bottom: 14px;">2</div>
+            <h3 style="margin-top: 0; margin-bottom: 8px; font-size: 19px; font-weight: 700; color: #714B67;">Conecte o n&uacute;mero</h3>
+            <p style="margin-top: 0; margin-bottom: 0; color: #6b7280; font-size: 15px;">Aponte o n&uacute;mero que sua equipe j&aacute; usa. Sem migra&ccedil;&atilde;o.</p>
+          </td>
+          <td class="wa_col wa_card" style="width: 33.33%; vertical-align: top; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding-top: 24px; padding-bottom: 24px; padding-left: 24px; padding-right: 24px;">
+            <div style="width: 40px; height: 40px; line-height: 40px; text-align: center; border-radius: 999px; background-color: #714B67; color: #ffffff; font-weight: 700; font-size: 17px; margin-bottom: 14px;">3</div>
+            <h3 style="margin-top: 0; margin-bottom: 8px; font-size: 19px; font-weight: 700; color: #714B67;">Atenda no Odoo</h3>
+            <p style="margin-top: 0; margin-bottom: 0; color: #6b7280; font-size: 15px;">Abra qualquer lead ou cota&ccedil;&atilde;o e a aba WhatsApp j&aacute; est&aacute; l&aacute;, com a conversa toda.</p>
+          </td>
+        </tr>
+      </table>
     </div>
   </div>
 
   <!-- ================= CTA ================= -->
-  <div class="wa_section" style="padding: 56px 0; text-align: center;">
-    <div class="wa_wrap" style="box-sizing: border-box; max-width: 1140px; margin: 0 auto; padding: 0 24px;">
-      <h2 class="wa_h2" style="margin: 0 0 12px; font-size: 30px; line-height: 1.2; font-weight: 700; color: #714B67;">
+  <div class="wa_section" style="padding-top: 56px; padding-bottom: 56px; text-align: center; background-color: #f7f7f9;">
+    <div class="wa_wrap" style="max-width: 1140px; margin-left: auto; margin-right: auto; padding-left: 24px; padding-right: 24px;">
+      <h2 class="wa_h2" style="margin-top: 0; margin-bottom: 12px; font-size: 30px; line-height: 1.2; font-weight: 700; color: #714B67;">
         Pronto pro WhatsApp morar dentro do seu Odoo?
       </h2>
-      <p class="wa_lead" style="margin: 0 auto 20px; max-width: 640px; font-size: 20px; color: #714B67;">
+      <p class="wa_lead" style="margin-top: 0; margin-bottom: 20px; margin-left: auto; margin-right: auto; max-width: 640px; font-size: 20px; color: #714B67;">
         Instale o m&oacute;dulo e comece a atender no mesmo lugar onde o seu funil de vendas j&aacute; vive.
       </p>
-      <p style="margin: 0; font-size: 15px; color: #714B67;">
+      <p style="margin-top: 0; margin-bottom: 0; font-size: 15px; color: #714B67;">
         VGR &nbsp;&bull;&nbsp; Odoo 19.0 &nbsp;&bull;&nbsp; Licen&ccedil;a OPL-1
       </p>
     </div>
