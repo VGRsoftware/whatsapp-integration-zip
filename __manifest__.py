@@ -37,7 +37,4 @@ This module is proprietary software and is licensed under OPL-1.
         ],
     },
     "installable": True,
-    "license": "LGPL-3",
-    "currency": "USD",
-    "price": "0.00"
 }
