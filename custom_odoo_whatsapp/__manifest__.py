@@ -23,7 +23,10 @@ This module is proprietary software and is licensed under OPL-1.
     "license": "OPL-1",
     "category": "Productivity/Discuss",
     "icon": "/custom_odoo_whatsapp/static/description/icon.png",
-    "images": ["static/description/icon.png"],
+    "images": [
+        "static/description/banner.png",
+        "static/description/icon.png",
+    ],
     "depends": ["crm", "sale_management"],
     "data": [
         "models/models.xml",
