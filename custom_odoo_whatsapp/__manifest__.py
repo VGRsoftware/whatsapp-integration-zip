@@ -19,7 +19,7 @@ Main Features
 This module is proprietary software and is licensed under OPL-1.
     """,
     "author": "VGR",
-    "version": "19.0.1.0.0",
+    "version": "19.0.1.1.0",
     "license": "OPL-1",
     "category": "Productivity/Discuss",
     "icon": "/custom_odoo_whatsapp/static/description/icon.png",

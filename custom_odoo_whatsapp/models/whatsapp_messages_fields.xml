@@ -69,4 +69,37 @@
     <field name="required">False</field>
     <field name="state">manual</field>
   </record>
+  <!-- Mídia: payload enviado pelo HUB externo em mensagens de imagem/áudio/documento -->
+  <record id="field_zap_messages_media_attachment_id" model="ir.model.fields">
+    <field name="model_id" ref="model_custom_zap_messages" />
+    <field name="name">x_media_attachment_id</field>
+    <field name="field_description">Media Id</field>
+    <field name="ttype">integer</field>
+    <field name="required">False</field>
+    <field name="state">manual</field>
+  </record>
+  <record id="field_zap_messages_media_filename" model="ir.model.fields">
+    <field name="model_id" ref="model_custom_zap_messages" />
+    <field name="name">x_media_filename</field>
+    <field name="field_description">Media Filename</field>
+    <field name="ttype">char</field>
+    <field name="required">False</field>
+    <field name="state">manual</field>
+  </record>
+  <record id="field_zap_messages_media_mimetype" model="ir.model.fields">
+    <field name="model_id" ref="model_custom_zap_messages" />
+    <field name="name">x_media_mimetype</field>
+    <field name="field_description">Media Mimetype</field>
+    <field name="ttype">char</field>
+    <field name="required">False</field>
+    <field name="state">manual</field>
+  </record>
+  <record id="field_zap_messages_media_type" model="ir.model.fields">
+    <field name="model_id" ref="model_custom_zap_messages" />
+    <field name="name">x_media_type</field>
+    <field name="field_description">Media Type</field>
+    <field name="ttype">char</field>
+    <field name="required">False</field>
+    <field name="state">manual</field>
+  </record>
 </odoo>
