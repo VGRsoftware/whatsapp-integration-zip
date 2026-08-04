@@ -1,23 +1,33 @@
-import { Chatter } from "@mail/chatter/web_portal/chatter";
+// Odoo 19.4 (saas~19.4): o componente Chatter mudou de
+// "@mail/chatter/web_portal/chatter" para "@mail/chatter/web_portal_project/chatter"
+// e o hook useRef passou a vir da camada de compatibilidade OWL 2 -> OWL 3.
+import { Chatter } from "@mail/chatter/web_portal_project/chatter";
 import { patch } from "@web/core/utils/patch";
-import { useRef } from "@odoo/owl";
+import { useRef } from "@web/owl2/utils";
 
 patch(Chatter.prototype, {
   setup() {
     super.setup();
-    this.zap = useRef("zap");
-    this.chatterTop = useRef("chatterTop");
-    this.chatterContent = useRef("chatterContent");
-    this.chatterBtn = useRef("chatter-btn");
-    this.zapBtn = useRef("zap-btn");
+    this.zapPanelRef = useRef("zap");
+    this.zapChatterBtnRef = useRef("chatterBtn");
+    this.zapBtnRef = useRef("zapBtn");
   },
 
   zapToggle(view) {
-    const zap = this.zap.el;
-    const chatterTop = this.chatterTop.el;
-    const chatterContent = this.chatterContent.el;
-    const zapBtn = this.zapBtn.el;
-    const chatterBtn = this.chatterBtn.el;
+    const zap = this.zapPanelRef.el;
+    const zapBtn = this.zapBtnRef.el;
+    const chatterBtn = this.zapChatterBtnRef.el;
+    if (!zap || !zapBtn || !chatterBtn) {
+      return;
+    }
+    // As divs nativas sao irmas do painel injetado; nao usamos t-ref nelas para
+    // nao sobrescrever o ref "top" usado pelo core.
+    const root = zap.parentElement;
+    const chatterTop = root.querySelector(":scope > .o-mail-Chatter-top");
+    const chatterContent = root.querySelector(":scope > .o-mail-Chatter-content");
+    if (!chatterTop || !chatterContent) {
+      return;
+    }
 
     if (view == "zap") {
       chatterBtn.classList.remove("btn-secondary");

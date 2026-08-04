@@ -19,7 +19,10 @@ Main Features
 This module is proprietary software and is licensed under OPL-1.
     """,
     "author": "VGR",
-    "version": "19.0.1.1.0",
+    # Sem prefixo de serie: o Odoo prefixa a serie corrente automaticamente
+    # (adapt_version). Fixar "19.0.x" faz check_version() falhar no saas~19.4
+    # e o modulo ser marcado installable=False na importacao.
+    "version": "1.2.1",
     "license": "OPL-1",
     "category": "Productivity/Discuss",
     "icon": "/custom_odoo_whatsapp/static/description/icon.png",
