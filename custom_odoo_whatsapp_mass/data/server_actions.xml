@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <!--
+    Acao de servidor de TESTE. Serve de esqueleto para o disparo do envio
+    em massa: ela le o template amarrado nela propria (x_whatsapp_template_id,
+    campo adicionado em models/mass_fields.xml) e apenas registra em log.
+    Nenhum template vem definido: quem instala escolhe o template na
+    propria acao (Configuracoes > Tecnico > Acoes > Acoes do Servidor)
+    ou pelo campo "WhatsApp Template" na form view da acao.
+
+    ATENCAO: em <field type="html"> o RelaxNG (odoo/import_xml.rng) exige
+    UM OU MAIS ELEMENTOS filhos. CDATA/texto puro reprova a validacao com
+    "Element odoo has extra content: record". Por isso o help abaixo e
+    markup de verdade, nao CDATA.
+  -->
+  <record id="action_server_whatsapp_test" model="ir.actions.server">
+    <field name="name">Teste - Envio em Massa WhatsApp</field>
+    <field name="model_id" ref="custom_odoo_whatsapp_mass.model_x_whatsapp_campaing" />
+    <field name="binding_model_id" ref="custom_odoo_whatsapp_mass.model_x_whatsapp_campaing" />
+    <field name="binding_view_types">list,form</field>
+    <field name="state">code</field>
+    <field name="help" type="html">
+      <p><b>Acao de servidor de teste do Envio em Massa.</b></p>
+      <p>
+        Ela le o template de WhatsApp amarrado nela propria, no campo
+        <code>x_whatsapp_template_id</code>, e escreve o resultado em
+        <i>Configuracoes &gt; Tecnico &gt; Logging</i>. Nao envia nada.
+      </p>
+      <p>
+        <b>Sobre o ID do browse():</b> no exemplo de referencia o codigo era
+        <code>env['ir.actions.server'].browse(692)</code> — e <b>692 e o ID desta
+        propria acao de servidor</b>, nao o ID de um template nem de uma campanha.
+        Ou seja: a acao busca a si mesma para ler o template configurado nela.
+      </p>
+      <p>
+        Como o ID gerado no banco so e conhecido depois da instalacao, o codigo usa
+        <code>env.ref('custom_odoo_whatsapp_mass.action_server_whatsapp_test')</code>,
+        que resolve exatamente o mesmo registro sem ID fixo. Para usar a forma literal
+        do exemplo, veja o ID desta acao e troque por
+        <code>env['ir.actions.server'].browse(&lt;ID desta acao&gt;)</code>.
+      </p>
+      <p>
+        <b>Template:</b> propositalmente vazio. Preencha o campo "WhatsApp Template"
+        antes de rodar, senao a acao so registra que nao ha template definido.
+      </p>
+    </field>
+    <field name="code"><![CDATA[
+# ---------------------------------------------------------------------------
+# ACAO DE SERVIDOR DE TESTE - Campanhas Whatsapp
+#
+# Exemplo de referencia:
+#
+#     minha_automacao = env['ir.actions.server'].browse(692)
+#     record['function'] = minha_automacao.x_whatsapp_template_id
+#
+# O 692 e o ID DESTA PROPRIA ACAO DE SERVIDOR: a acao le o template
+# configurado nela mesma. Como o ID no seu banco so existe depois da
+# instalacao, resolvemos por XML ID (mesmo registro, sem hardcode).
+# Forma literal equivalente, se preferir:
+#
+#     minha_automacao = env['ir.actions.server'].browse(<ID desta acao>)
+# ---------------------------------------------------------------------------
+
+minha_automacao = env.ref('custom_odoo_whatsapp_mass.action_server_whatsapp_test')
+template = minha_automacao.x_whatsapp_template_id
+
+if not template:
+    log("[Envio em Massa] Acao ID %s: nenhum template em x_whatsapp_template_id." % minha_automacao.id)
+else:
+    log("[Envio em Massa] Acao ID %s -> template '%s' (id %s)." % (
+        minha_automacao.id, template.x_name, template.id))
+    log("[Envio em Massa] Corpo do template: %s" % (template.x_body or '<vazio>'))
+
+# `records` so existe quando a acao roda a partir de uma lista/form de campanha.
+if template and records:
+    for campanha in records:
+        log("[Envio em Massa] Campanha '%s' | destinatarios: %s | numero: %s | envio: %s" % (
+            campanha.x_name,
+            len(campanha.x_partner_ids),
+            campanha.x_number or '-',
+            campanha.x_send_date or '-'))
+]]></field>
+  </record>
+</odoo>

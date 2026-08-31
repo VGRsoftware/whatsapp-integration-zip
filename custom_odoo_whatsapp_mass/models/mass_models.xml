@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <!--
+    Models manuais (state=manual): o Odoo cria a tabela e instancia o model no
+    registry ja no create() de ir.model, entao os arquivos seguintes
+    (mass_fields.xml, views.xml) ja encontram os models prontos.
+    Nome do model precisa comecar com "x_" e os campos com "x_".
+  -->
+  <record id="model_x_whatsapp_template" model="ir.model">
+    <field name="name">WhatsApp Template</field>
+    <field name="model">x_whatsapp_template</field>
+    <field name="state">manual</field>
+  </record>
+
+  <record id="model_x_whatsapp_campaing" model="ir.model">
+    <field name="name">WhatsApp Campaing</field>
+    <field name="model">x_whatsapp_campaing</field>
+    <field name="state">manual</field>
+  </record>
+</odoo>

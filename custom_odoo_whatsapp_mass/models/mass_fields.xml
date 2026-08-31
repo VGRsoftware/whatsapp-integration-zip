@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <!-- ============================ x_whatsapp_template ============================ -->
+
+  <!-- x_name: em model manual o Odoo usa x_name como _rec_name (display_name). -->
+  <record id="field_template_name" model="ir.model.fields">
+    <field name="model_id" ref="model_x_whatsapp_template" />
+    <field name="name">x_name</field>
+    <field name="field_description">Name</field>
+    <field name="ttype">char</field>
+    <field name="required">True</field>
+    <field name="state">manual</field>
+  </record>
+
+  <!-- Corpo da mensagem em HTML. -->
+  <record id="field_template_body" model="ir.model.fields">
+    <field name="model_id" ref="model_x_whatsapp_template" />
+    <field name="name">x_body</field>
+    <field name="field_description">Body</field>
+    <field name="ttype">html</field>
+    <field name="required">False</field>
+    <field name="state">manual</field>
+  </record>
+
+  <!-- ============================ x_whatsapp_campaing ============================ -->
+
+  <record id="field_campaing_name" model="ir.model.fields">
+    <field name="model_id" ref="model_x_whatsapp_campaing" />
+    <field name="name">x_name</field>
+    <field name="field_description">Name</field>
+    <field name="ttype">char</field>
+    <field name="required">True</field>
+    <field name="state">manual</field>
+  </record>
+
+  <!--
+    Destinatarios: many2many para res.partner. Tabela de ligacao e colunas
+    declaradas de forma explicita para nao depender do nome default gerado
+    por _custom_many2many_names().
+  -->
+  <record id="field_campaing_partner_ids" model="ir.model.fields">
+    <field name="model_id" ref="model_x_whatsapp_campaing" />
+    <field name="name">x_partner_ids</field>
+    <field name="field_description">Recipients</field>
+    <field name="ttype">many2many</field>
+    <field name="relation">res.partner</field>
+    <field name="relation_table">x_whatsapp_campaing_partner_rel</field>
+    <field name="column1">campaing_id</field>
+    <field name="column2">partner_id</field>
+    <field name="required">False</field>
+    <field name="state">manual</field>
+  </record>
+
+  <record id="field_campaing_template_id" model="ir.model.fields">
+    <field name="model_id" ref="model_x_whatsapp_campaing" />
+    <field name="name">x_template_id</field>
+    <field name="field_description">Template</field>
+    <field name="ttype">many2one</field>
+    <field name="relation">x_whatsapp_template</field>
+    <field name="on_delete">restrict</field>
+    <field name="required">True</field>
+    <field name="state">manual</field>
+  </record>
+
+  <!-- Numero remetente. Char, nao relacao: guarda o x_session_id da seat do HUB. -->
+  <record id="field_campaing_number" model="ir.model.fields">
+    <field name="model_id" ref="model_x_whatsapp_campaing" />
+    <field name="name">x_number</field>
+    <field name="field_description">Number</field>
+    <field name="ttype">char</field>
+    <field name="required">False</field>
+    <field name="state">manual</field>
+  </record>
+
+  <!-- Data de envio: datetime (data + hora), gravado em UTC pelo Odoo. -->
+  <record id="field_campaing_send_date" model="ir.model.fields">
+    <field name="model_id" ref="model_x_whatsapp_campaing" />
+    <field name="name">x_send_date</field>
+    <field name="field_description">Send Date</field>
+    <field name="ttype">datetime</field>
+    <field name="required">True</field>
+    <field name="state">manual</field>
+  </record>
+
+  <!--
+    Status da campanha. Selection manual: o ir.model.fields declara o campo e
+    cada opcao entra como ir.model.fields.selection (value = chave gravada no
+    banco, name = rotulo exibido). A ordem na UI segue o sequence.
+  -->
+  <record id="field_campaing_status" model="ir.model.fields">
+    <field name="model_id" ref="model_x_whatsapp_campaing" />
+    <field name="name">x_status</field>
+    <field name="field_description">Status</field>
+    <field name="ttype">selection</field>
+    <field name="required">False</field>
+    <field name="state">manual</field>
+  </record>
+
+  <record id="field_campaing_status_pending" model="ir.model.fields.selection">
+    <field name="field_id" ref="field_campaing_status" />
+    <field name="value">pending</field>
+    <field name="name">Pendente</field>
+    <field name="sequence">10</field>
+  </record>
+  <record id="field_campaing_status_processing" model="ir.model.fields.selection">
+    <field name="field_id" ref="field_campaing_status" />
+    <field name="value">processing</field>
+    <field name="name">Em processamento</field>
+    <field name="sequence">20</field>
+  </record>
+  <record id="field_campaing_status_sent" model="ir.model.fields.selection">
+    <field name="field_id" ref="field_campaing_status" />
+    <field name="value">sent</field>
+    <field name="name">Enviado</field>
+    <field name="sequence">30</field>
+  </record>
+  <record id="field_campaing_status_error" model="ir.model.fields.selection">
+    <field name="field_id" ref="field_campaing_status" />
+    <field name="value">error</field>
+    <field name="name">Erro</field>
+    <field name="sequence">40</field>
+  </record>
+
+  <!--
+    Default "pending" para toda campanha nova. company_id=False = vale para
+    todas as companhias (o default do model seria a companhia corrente).
+  -->
+  <record id="default_campaing_status" model="ir.default">
+    <field name="field_id" ref="field_campaing_status" />
+    <field name="json_value">"pending"</field>
+    <field name="company_id" eval="False" />
+  </record>
+
+  <!-- ============================ ir.actions.server ============================ -->
+
+  <!--
+    Campo manual em ir.actions.server: permite amarrar uma acao servidor a um
+    template de WhatsApp (o disparo em massa e montado depois em cima disso).
+    Coluna gravada na tabela ir_act_server.
+  -->
+  <record id="field_server_action_template_id" model="ir.model.fields">
+    <field name="model_id" ref="base.model_ir_actions_server" />
+    <field name="name">x_whatsapp_template_id</field>
+    <field name="field_description">WhatsApp Template</field>
+    <field name="ttype">many2one</field>
+    <field name="relation">x_whatsapp_template</field>
+    <field name="on_delete">set null</field>
+    <field name="required">False</field>
+    <field name="state">manual</field>
+  </record>
+
+</odoo>
