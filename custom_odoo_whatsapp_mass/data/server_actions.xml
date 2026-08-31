@@ -1,17 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
   <!--
-    Acao de servidor de TESTE. Serve de esqueleto para o disparo do envio
-    em massa: ela le o template amarrado nela propria (x_whatsapp_template_id,
-    campo adicionado em models/mass_fields.xml) e apenas registra em log.
-    Nenhum template vem definido: quem instala escolhe o template na
-    propria acao (Configuracoes > Tecnico > Acoes > Acoes do Servidor)
-    ou pelo campo "WhatsApp Template" na form view da acao.
+    Acao de servidor de TESTE do Envio em Massa.
+
+    Regra de negocio: o corpo HTML do template (x_body) usa placeholders no
+    formato {campo}, onde `campo` e o NOME TECNICO de um campo de res.partner.
+    A acao monta o texto final por destinatario da campanha e envia para o
+    endpoint X (placeholder, ainda nao definido).
+
+    Limites do safe_eval de server action (confirmado em saas-19.4,
+    ir_actions.py::_get_eval_context): estao disponiveis apenas
+    env, model, record, records, log, _logger, uid, user, time, datetime,
+    dateutil, timezone, float_compare, b64encode, b64decode, BinaryBytes,
+    Command e UserError. NAO ha re, json, requests nem urllib -> o parser de
+    placeholders e feito na mao e o POST fica documentado, nao executado.
 
     ATENCAO: em <field type="html"> o RelaxNG (odoo/import_xml.rng) exige
     UM OU MAIS ELEMENTOS filhos. CDATA/texto puro reprova a validacao com
-    "Element odoo has extra content: record". Por isso o help abaixo e
-    markup de verdade, nao CDATA.
+    "Element odoo has extra content: record".
   -->
   <record id="action_server_whatsapp_test" model="ir.actions.server">
     <field name="name">Teste - Envio em Massa WhatsApp</field>
@@ -21,23 +27,62 @@
     <field name="state">code</field>
     <field name="help" type="html">
       <p><b>Acao de servidor de teste do Envio em Massa.</b></p>
+
       <p>
-        Ela le o template de WhatsApp amarrado nela propria, no campo
-        <code>x_whatsapp_template_id</code>, e escreve o resultado em
-        <i>Configuracoes &gt; Tecnico &gt; Logging</i>. Nao envia nada.
+        Roda a partir da lista ou do formulario de Campanhas (menu de engrenagem
+        <i>Acoes</i>). Para cada destinatario da campanha ela monta o texto final
+        do template e registra o payload em <i>Configuracoes &gt; Tecnico &gt; Logging</i>.
+        <b>Nao envia nada ainda</b> — o endpoint e um placeholder chamado "X".
+      </p>
+
+      <h4>Placeholders do template</h4>
+      <p>
+        O campo HTML do template (<code>x_body</code>) aceita marcadores no formato
+        <code>{campo}</code>, onde <code>campo</code> e o <b>nome tecnico de um campo de
+        res.partner</b>. Exemplo: <code>Ola {name}, seu email e {email}.</code>
+      </p>
+      <p>Como cada tipo e convertido:</p>
+      <ul>
+        <li><b>char / text / number / date</b>: valor convertido para texto.</li>
+        <li><b>many2one</b>: usa o <code>display_name</code> do registro.</li>
+        <li><b>many2many / one2many</b>: <code>display_name</code> de cada registro, separados por virgula.</li>
+        <li><b>vazio / False</b>: vira string vazia.</li>
+        <li><b>campo inexistente em res.partner</b>: o placeholder e mantido literal e um aviso vai para o log.</li>
+      </ul>
+      <p>
+        O valor substituido e escapado automaticamente (o corpo e <code>Markup</code>),
+        entao nome de parceiro com <code>&amp;</code> ou <code>&lt;</code> nao quebra o HTML.
+      </p>
+
+      <h4>Envio: endpoint X</h4>
+      <p>
+        Cada mensagem montada gera um payload com <code>campaign_id</code>,
+        <code>from_number</code>, <code>send_date</code>, <code>template_id</code>,
+        <code>partner_id</code>, <code>to</code> e <code>body_html</code>.
+        Esse payload seria enviado ao <b>endpoint X</b>.
       </p>
       <p>
-        <b>Sobre o ID do browse():</b> no exemplo de referencia o codigo era
-        <code>env['ir.actions.server'].browse(692)</code> — e <b>692 e o ID desta
-        propria acao de servidor</b>, nao o ID de um template nem de uma campanha.
-        Ou seja: a acao busca a si mesma para ler o template configurado nela.
+        <b>Telefone:</b> o destino sai sempre de <code>res.partner.phone</code> — sem
+        fallback para <code>mobile</code>. Parceiro sem <code>phone</code> ainda tem a
+        mensagem montada, com <code>to</code> vazio e um aviso no log.
       </p>
       <p>
-        Como o ID gerado no banco so e conhecido depois da instalacao, o codigo usa
+        O POST nao acontece dentro desta acao: o <code>safe_eval</code> de server action
+        nao expoe <code>requests</code> nem <code>urllib</code>. Quando o endpoint X for
+        definido, o disparo deve sair de um modulo Python (metodo no HUB ou um
+        <code>ir.cron</code> chamando codigo do addon), lendo os mesmos campos.
+        Enquanto isso a acao so registra o payload no log.
+      </p>
+
+      <h4>Sobre o ID do browse()</h4>
+      <p>
+        No exemplo de referencia o codigo era
+        <code>env['ir.actions.server'].browse(692)</code> — e <b>692 e o ID desta propria
+        acao de servidor</b>, nao o ID de um template nem de uma campanha: a acao busca a
+        si mesma para ler o template configurado nela. Como o ID gerado no banco so e
+        conhecido depois da instalacao, o codigo usa
         <code>env.ref('custom_odoo_whatsapp_mass.action_server_whatsapp_test')</code>,
-        que resolve exatamente o mesmo registro sem ID fixo. Para usar a forma literal
-        do exemplo, veja o ID desta acao e troque por
-        <code>env['ir.actions.server'].browse(&lt;ID desta acao&gt;)</code>.
+        que resolve o mesmo registro sem ID fixo.
       </p>
       <p>
         <b>Template:</b> propositalmente vazio. Preencha o campo "WhatsApp Template"
@@ -48,37 +93,114 @@
 # ---------------------------------------------------------------------------
 # ACAO DE SERVIDOR DE TESTE - Campanhas Whatsapp
 #
-# Exemplo de referencia:
+# Regra de negocio:
+#   O corpo HTML do template usa {campo}, onde `campo` e o nome tecnico de um
+#   campo de res.partner. Para cada destinatario da campanha montamos o texto
+#   final e enviamos ao endpoint X (ainda placeholder).
 #
+# Exemplo de referencia do ID:
 #     minha_automacao = env['ir.actions.server'].browse(692)
-#     record['function'] = minha_automacao.x_whatsapp_template_id
+#   692 = ID DESTA PROPRIA ACAO. Resolvemos por XML ID para nao depender do ID
+#   gerado no banco. Forma literal equivalente: browse(<ID desta acao>).
 #
-# O 692 e o ID DESTA PROPRIA ACAO DE SERVIDOR: a acao le o template
-# configurado nela mesma. Como o ID no seu banco so existe depois da
-# instalacao, resolvemos por XML ID (mesmo registro, sem hardcode).
-# Forma literal equivalente, se preferir:
-#
-#     minha_automacao = env['ir.actions.server'].browse(<ID desta acao>)
+# Limites do safe_eval: sem re / json / requests / urllib. Parser de
+# placeholders feito na mao; POST apenas documentado.
 # ---------------------------------------------------------------------------
+
+# Endpoint de destino. Placeholder ate a definicao do servico real.
+ENDPOINT_X = "x"
 
 minha_automacao = env.ref('custom_odoo_whatsapp_mass.action_server_whatsapp_test')
 template = minha_automacao.x_whatsapp_template_id
 
 if not template:
-    log("[Envio em Massa] Acao ID %s: nenhum template em x_whatsapp_template_id." % minha_automacao.id)
+    log("[Envio em Massa] Acao ID %s: nenhum template em x_whatsapp_template_id." % minha_automacao.id,
+        level='warning')
 else:
-    log("[Envio em Massa] Acao ID %s -> template '%s' (id %s)." % (
-        minha_automacao.id, template.x_name, template.id))
-    log("[Envio em Massa] Corpo do template: %s" % (template.x_body or '<vazio>'))
+    # `records` so existe quando a acao roda a partir de uma lista/form de
+    # campanha; `model` e o recordset vazio de x_whatsapp_campaing.
+    campanhas = records or model
 
-# `records` so existe quando a acao roda a partir de uma lista/form de campanha.
-if template and records:
-    for campanha in records:
-        log("[Envio em Massa] Campanha '%s' | destinatarios: %s | numero: %s | envio: %s" % (
-            campanha.x_name,
-            len(campanha.x_partner_ids),
-            campanha.x_number or '-',
-            campanha.x_send_date or '-'))
+    if not campanhas:
+        log("[Envio em Massa] Acao ID %s: rodou sem campanha selecionada, nada a montar."
+            % minha_automacao.id, level='warning')
+
+    # Metadados de res.partner: usados para validar o placeholder e saber o
+    # tipo do campo. `nome in campos_partner` evita tocar em _fields (o
+    # safe_eval bloqueia atributos com underscore).
+    campos_partner = env['res.partner'].fields_get()
+    corpo = template.x_body or ''
+
+    for campanha in campanhas:
+        montadas = 0
+
+        for parceiro in campanha.x_partner_ids:
+            # ---- parser de {campo} sem regex -------------------------------
+            partes = corpo.split('{')
+            texto = partes[0]
+
+            for parte in partes[1:]:
+                if '}' not in parte:
+                    # chave sem fechamento: mantem literal
+                    texto += '{' + parte
+                    continue
+
+                chave, resto = parte.split('}', 1)
+                nome_campo = chave.strip()
+
+                if nome_campo not in campos_partner:
+                    log("[Envio em Massa] Placeholder '{%s}' ignorado: campo inexistente em res.partner."
+                        % nome_campo, level='warning')
+                    texto += '{' + parte
+                    continue
+
+                valor = parceiro[nome_campo]
+                tipo = campos_partner[nome_campo]['type']
+
+                if not valor:
+                    valor = ''
+                elif tipo == 'many2one':
+                    valor = valor.display_name
+                elif tipo in ('many2many', 'one2many'):
+                    valor = ', '.join(valor.mapped('display_name'))
+                else:
+                    valor = str(valor)
+
+                # `texto` e Markup (campo html) -> o valor injetado e escapado
+                # automaticamente; `resto` segue como Markup e nao e escapado.
+                texto += valor + resto
+            # ----------------------------------------------------------------
+
+            # Telefone: sempre res.partner.phone. Sem fallback para mobile.
+            destino = parceiro.phone or ''
+            if not destino:
+                log("[Envio em Massa] Parceiro '%s' (id %s) sem phone: mensagem montada sem destino."
+                    % (parceiro.display_name, parceiro.id), level='warning')
+
+            payload = {
+                'campaign_id': campanha.id,
+                'campaign': campanha.x_name,
+                'from_number': campanha.x_number or '',
+                'send_date': str(campanha.x_send_date or ''),
+                'template_id': template.id,
+                'partner_id': parceiro.id,
+                'to': destino,
+                'body_html': str(texto),
+            }
+
+            # TODO endpoint X: o POST nao roda aqui (safe_eval nao expoe
+            # requests/urllib). Quando o endpoint estiver definido, mover o
+            # disparo para codigo Python do addon / HUB, consumindo este mesmo
+            # payload. Por ora so registramos o que seria enviado.
+            log("[Envio em Massa] POST %s -> %s" % (ENDPOINT_X, payload))
+            montadas += 1
+
+        log("[Envio em Massa] Campanha '%s' (id %s): %s mensagem(ns) montada(s) para o endpoint '%s'."
+            % (campanha.x_name, campanha.id, montadas, ENDPOINT_X))
+
+        # TODO status: com o envio real, gravar x_status = 'processing' antes do
+        # POST e 'sent' / 'error' conforme a resposta do endpoint X. A acao de
+        # teste nao altera status porque nao envia de fato.
 ]]></field>
   </record>
 </odoo>

@@ -23,6 +23,11 @@
             <field name="x_name" placeholder="Nome do template" />
           </group>
           <group string="Mensagem">
+            <div class="text-muted" colspan="2">
+              Placeholders: use <code>{campo}</code> com o nome tecnico de um campo de
+              res.partner (ex.: <code>{name}</code>, <code>{email}</code>, <code>{phone}</code>).
+              Placeholder de campo inexistente fica literal no texto.
+            </div>
             <field name="x_body" widget="html" nolabel="1" colspan="2" />
           </group>
         </sheet>
