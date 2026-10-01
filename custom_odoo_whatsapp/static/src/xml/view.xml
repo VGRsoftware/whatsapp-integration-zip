@@ -13,7 +13,9 @@
   <t t-inherit="mail.Chatter" t-inherit-mode="extension">
 
     <xpath expr="//div[hasclass('o-mail-Chatter-top')]" position="before">
-      <t t-if="this.webChatterProps.record and (this.webChatterProps.record.resModel === 'crm.lead' or this.webChatterProps.record.resModel === 'sale.order')">
+      <!-- crm.lead / sale.order (campo x_iframe) e helpdesk.ticket (URL montada
+           no JS, Helpdesk opcional). Ver zapUrl em form_patch.js. -->
+      <t t-if="this.zapUrl">
         <div class="o-chatter-zap-toggle d-flex mx-2 mt-2">
 
           <button t-custom-ref="chatterBtn"
@@ -28,7 +30,7 @@
 
         <div t-custom-ref="zap" class="o-chatter-zap-panel hidden px-2 pb-2 mt-2"
           style="width:100%; height:100%; min-height: 500px; overflow:hidden;">
-          <iframe t-att-src="this.webChatterProps.record.data.x_iframe"
+          <iframe t-att-src="this.zapUrl"
             style="width:100%; min-height: 600px; height:100%; border-radius:6px; border: #262A36 solid 1px" />
         </div>
       </t>

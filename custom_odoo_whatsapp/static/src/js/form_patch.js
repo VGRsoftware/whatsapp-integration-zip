@@ -4,8 +4,34 @@
 import { Chatter } from "@mail/chatter/web_portal_project/chatter";
 import { patch } from "@web/core/utils/patch";
 import { useRef } from "@web/owl2/utils";
+import { user } from "@web/core/user";
 
 patch(Chatter.prototype, {
+  // URL do painel. crm.lead e sale.order usam o campo computado x_iframe.
+  // helpdesk.ticket monta a URL aqui no cliente: o Helpdesk e opcional e o
+  // modulo nao pode referenciar nada dele nos arquivos de dados (a importacao
+  // falharia em bases sem Helpdesk).
+  get zapUrl() {
+    const record = this.webChatterProps.record;
+    if (!record) {
+      return false;
+    }
+    if (record.data.x_iframe) {
+      return record.data.x_iframe;
+    }
+    if (record.resModel === "helpdesk.ticket" && record.resId) {
+      const partner = record.data.partner_id;
+      const phone = (record.data.partner_phone || "").replace(/[\s+-]/g, "");
+      return (
+        "https://whatsapp-odoo.pages.dev/?partner_id=" + (partner ? partner.id : false) +
+        "&contact_phone=" + phone +
+        "&odoo_url=" + window.location.origin +
+        "&odoo_user_id=" + user.userId
+      );
+    }
+    return false;
+  },
+
   setup() {
     super.setup();
     this.zapPanelRef = useRef("zap");
