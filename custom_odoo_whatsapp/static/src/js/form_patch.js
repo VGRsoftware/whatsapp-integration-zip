@@ -1,27 +1,37 @@
-// Odoo 19.4 (saas~19.4): o componente Chatter mudou de
-// "@mail/chatter/web_portal/chatter" para "@mail/chatter/web_portal_project/chatter"
-// e o hook useRef passou a vir da camada de compatibilidade OWL 2 -> OWL 3.
+// Odoo 20: useRef foi removido de "@web/owl2/utils". Refs agora sao signals
+// criados com signal.ref(Tipo) e lidos chamando o signal (this.zapPanelRef()).
 import { Chatter } from "@mail/chatter/web_portal_project/chatter";
 import { patch } from "@web/core/utils/patch";
-import { useRef } from "@web/owl2/utils";
+import { signal } from "@odoo/owl";
+
+// Models com campo x_iframe (models/models.xml) onde o toggle aparece.
+const ZAP_MODELS = [
+  "crm.lead",
+  "sale.order",
+  "helpdesk.ticket",
+  "project.task",
+  "res.partner",
+  "account.move",
+];
 
 patch(Chatter.prototype, {
   setup() {
     super.setup();
-    this.zapPanelRef = useRef("zap");
-    this.zapChatterBtnRef = useRef("chatterBtn");
-    this.zapBtnRef = useRef("zapBtn");
+    this.zapModels = ZAP_MODELS;
+    this.zapPanelRef = signal.ref(HTMLDivElement);
+    this.zapChatterBtnRef = signal.ref(HTMLButtonElement);
+    this.zapBtnRef = signal.ref(HTMLButtonElement);
   },
 
   zapToggle(view) {
-    const zap = this.zapPanelRef.el;
-    const zapBtn = this.zapBtnRef.el;
-    const chatterBtn = this.zapChatterBtnRef.el;
+    const zap = this.zapPanelRef();
+    const zapBtn = this.zapBtnRef();
+    const chatterBtn = this.zapChatterBtnRef();
     if (!zap || !zapBtn || !chatterBtn) {
       return;
     }
     // As divs nativas sao irmas do painel injetado; nao usamos t-ref nelas para
-    // nao sobrescrever o ref "top" usado pelo core.
+    // nao interferir nos refs do core.
     const root = zap.parentElement;
     const chatterTop = root.querySelector(":scope > .o-mail-Chatter-top");
     const chatterContent = root.querySelector(":scope > .o-mail-Chatter-content");

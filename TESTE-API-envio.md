@@ -3,7 +3,7 @@
 Roteiro para validar o endpoint de recebimento (`API recebimento.md`) e decidir
 **por qual caminho o zip do Odoo vai disparar**.
 
-Base: `https://zap-odoo-production.up.railway.app`
+Base: `https://zap-odoo-production-1063.up.railway.app`
 Token: campo `x_api_token` do registro em **Whatsapp Números** (base HUB).
 
 Os testes são encadeados. Rode na ordem: A e B validam a API sozinha; C decide
@@ -28,7 +28,7 @@ Menor teste possível. Se falhar aqui, nada mais importa.
 
 ```bash
 TOKEN="COLE_SEU_TOKEN_AQUI"
-BASE="https://zap-odoo-production.up.railway.app"
+BASE="https://zap-odoo-production-1063.up.railway.app"
 
 curl -i -X POST "$BASE/send" \
   -H "Authorization: Bearer $TOKEN" \
@@ -80,7 +80,7 @@ import time
 import urllib.error
 import urllib.request
 
-BASE = "https://zap-odoo-production.up.railway.app"
+BASE = "https://zap-odoo-production-1063.up.railway.app"
 TOKEN = os.environ.get("ZAP_TOKEN") or "COLE_SEU_TOKEN_AQUI"
 
 # Corpo do template como esta gravado em x_whatsapp_template.x_body,
@@ -149,7 +149,7 @@ e rode.
 # Nao envia mensagem: manda content vazio, a API deve responder 400.
 try:
     resposta = requests.post(
-        "https://zap-odoo-production.up.railway.app/send",
+        "https://zap-odoo-production-1063.up.railway.app/send",
         json={"message": "sonda", "content": []},
         headers={"Authorization": "Bearer COLE_SEU_TOKEN_AQUI"},
         timeout=10,
@@ -198,7 +198,7 @@ com *binding* em `list,form` para aparecer no menu **Ações** e no botão do fo
 # Sem `json` no safe_eval: nao e preciso. requests.post(json=...) serializa.
 # ---------------------------------------------------------------------------
 
-BASE = "https://zap-odoo-production.up.railway.app"
+BASE = "https://zap-odoo-production-1063.up.railway.app"
 TOKEN = env["ir.config_parameter"].sudo().get_param("whatsapp_mass.api_token")
 
 if not TOKEN:
@@ -343,7 +343,7 @@ se ele aparecer em log.
 Ação separada, mesmo modelo, para atualizar o status a partir do `batch_id`:
 
 ```python
-BASE = "https://zap-odoo-production.up.railway.app"
+BASE = "https://zap-odoo-production-1063.up.railway.app"
 TOKEN = env["ir.config_parameter"].sudo().get_param("whatsapp_mass.api_token")
 
 for campanha in (records or model):

@@ -10,3 +10,12 @@
 .hidden {
   display: none !important;
 }
+
+/* Mesmo espacamento do .o-mail-Chatter-top (Odoo 20) para alinhar o toggle
+   com os botoes do form view e afasta-lo de "Enviar mensagem"/"Nota interna". */
+.o-chatter-zap-toggle {
+  padding-top: var(--Chatter-top-padding-top, 0.5rem);
+  padding-left: var(--ChatterAsideForm-padding-left, 1rem);
+  padding-right: 1rem;
+  margin-bottom: 0.5rem;
+}

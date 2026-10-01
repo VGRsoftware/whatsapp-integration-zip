@@ -63,23 +63,23 @@
     <field name="state">manual</field>
   </record>
 
-  <!-- Numero remetente. Char, nao relacao: guarda o x_session_id da seat do HUB. -->
-  <record id="field_campaing_number" model="ir.model.fields">
-    <field name="model_id" ref="model_x_whatsapp_campaing" />
-    <field name="name">x_number</field>
-    <field name="field_description">Number</field>
-    <field name="ttype">char</field>
-    <field name="required">False</field>
-    <field name="state">manual</field>
-  </record>
-
   <!-- Data de envio: datetime (data + hora), gravado em UTC pelo Odoo. -->
   <record id="field_campaing_send_date" model="ir.model.fields">
     <field name="model_id" ref="model_x_whatsapp_campaing" />
     <field name="name">x_send_date</field>
     <field name="field_description">Send Date</field>
     <field name="ttype">datetime</field>
-    <field name="required">True</field>
+    <field name="required">False</field>
+    <field name="state">manual</field>
+  </record>
+
+  <!-- batch_id devolvido pela API (POST /send -> 202), usado em GET /send/<batch_id>. -->
+  <record id="field_campaing_batch_id" model="ir.model.fields">
+    <field name="model_id" ref="model_x_whatsapp_campaing" />
+    <field name="name">x_batch_id</field>
+    <field name="field_description">Batch ID</field>
+    <field name="ttype">char</field>
+    <field name="required">False</field>
     <field name="state">manual</field>
   </record>
 

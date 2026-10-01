@@ -3,7 +3,7 @@
 API pública para disparo de mensagens WhatsApp a partir de um número já
 conectado. Autenticação por Bearer token, um token por número.
 
-Base: `https://zap-odoo-production.up.railway.app`
+Base: `https://zap-odoo-production-1063.up.railway.app`
 
 ---
 
@@ -138,7 +138,7 @@ retomado automaticamente — nada é perdido nem enviado em duplicidade.
 ## Exemplo
 
 ```bash
-curl -X POST https://zap-odoo-production.up.railway.app/send \
+curl -X POST https://zap-odoo-production-1063.up.railway.app/send \
   -H "Authorization: Bearer SEU_TOKEN_AQUI" \
   -H "Content-Type: application/json" \
   -d '{

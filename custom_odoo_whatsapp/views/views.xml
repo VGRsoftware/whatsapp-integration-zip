@@ -20,4 +20,44 @@
       </xpath>
     </field>
   </record>
+  <record model="ir.ui.view" id="form_chatter_toggle_helpdesk">
+    <field name="name">form.chatter.toggle</field>
+    <field name="model">helpdesk.ticket</field>
+    <field name="inherit_id" ref="helpdesk.helpdesk_ticket_view_form" />
+    <field name="arch" type="xml">
+      <xpath expr="//form" position="inside">
+        <field name="x_iframe" invisible="1" />
+      </xpath>
+    </field>
+  </record>
+  <record model="ir.ui.view" id="form_chatter_toggle_task">
+    <field name="name">form.chatter.toggle</field>
+    <field name="model">project.task</field>
+    <field name="inherit_id" ref="project.view_task_form2" />
+    <field name="arch" type="xml">
+      <xpath expr="//form" position="inside">
+        <field name="x_iframe" invisible="1" />
+      </xpath>
+    </field>
+  </record>
+  <record model="ir.ui.view" id="form_chatter_toggle_partner">
+    <field name="name">form.chatter.toggle</field>
+    <field name="model">res.partner</field>
+    <field name="inherit_id" ref="base.view_partner_form" />
+    <field name="arch" type="xml">
+      <xpath expr="//form" position="inside">
+        <field name="x_iframe" invisible="1" />
+      </xpath>
+    </field>
+  </record>
+  <record model="ir.ui.view" id="form_chatter_toggle_invoice">
+    <field name="name">form.chatter.toggle</field>
+    <field name="model">account.move</field>
+    <field name="inherit_id" ref="account.view_move_form" />
+    <field name="arch" type="xml">
+      <xpath expr="//form" position="inside">
+        <field name="x_iframe" invisible="1" />
+      </xpath>
+    </field>
+  </record>
 </odoo>

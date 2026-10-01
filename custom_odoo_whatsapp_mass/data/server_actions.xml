@@ -1,19 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
   <!--
-    Acao de servidor de TESTE do Envio em Massa.
+    Acao de servidor de TESTE do Envio em Massa, no formato da API ZapOdoo
+    (`API recebimento.md`, POST /send).
 
-    Regra de negocio: o corpo HTML do template (x_body) usa placeholders no
-    formato {campo}, onde `campo` e o NOME TECNICO de um campo de res.partner.
-    A acao monta o texto final por destinatario da campanha e envia para o
-    endpoint X (placeholder, ainda nao definido).
+    Regra de negocio:
+      * o template (x_body) usa marcadores {{campo}}, onde `campo` e o NOME
+        TECNICO de um campo de res.partner - mesmo formato de marcador da API;
+      * para cada campanha a acao monta UM request por lote de ate 1000
+        destinatarios: `message` (template em texto puro) + `content[]` com
+        `number` e `params` de cada parceiro. A substituicao e feita pela API;
+      * o remetente e definido pelo token (header Authorization), nao vai no body.
 
-    Limites do safe_eval de server action (confirmado em saas-19.4,
+    Limites do safe_eval de server action (confirmado em saas-19.4 e 20.0,
     ir_actions.py::_get_eval_context): estao disponiveis apenas
     env, model, record, records, log, _logger, uid, user, time, datetime,
     dateutil, timezone, float_compare, b64encode, b64decode, BinaryBytes,
     Command e UserError. NAO ha re, json, requests nem urllib -> o parser de
-    placeholders e feito na mao e o POST fica documentado, nao executado.
+    placeholders e feito na mao. O POST usa `requests` se a base o expuser;
+    senao (padrao do Odoo, inclusive Odoo Online) a acao para com UserError.
 
     ATENCAO: em <field type="html"> o RelaxNG (odoo/import_xml.rng) exige
     UM OU MAIS ELEMENTOS filhos. CDATA/texto puro reprova a validacao com
@@ -26,181 +31,186 @@
     <field name="binding_view_types">list,form</field>
     <field name="state">code</field>
     <field name="help" type="html">
-      <p><b>Acao de servidor de teste do Envio em Massa.</b></p>
+      <p><b>Acao de servidor de teste do Envio em Massa (API ZapOdoo, POST /send).</b></p>
 
       <p>
         Roda a partir da lista ou do formulario de Campanhas (menu de engrenagem
-        <i>Acoes</i>). Para cada destinatario da campanha ela monta o texto final
-        do template e registra o payload em <i>Configuracoes &gt; Tecnico &gt; Logging</i>.
-        <b>Nao envia nada ainda</b> — o endpoint e um placeholder chamado "X".
+        <i>Acoes</i>). Para cada campanha ela monta o request exatamente como a API
+        espera, registra em <i>Configuracoes &gt; Tecnico &gt; Logging</i> e
+        <b>envia de verdade</b> para <code>POST {base}/send</code>.
+      </p>
+      <p>
+        O envio precisa de <code>requests</code> no <code>safe_eval</code>, que o Odoo
+        padrao (inclusive Odoo Online) nao expoe. Sem ele a acao para com um aviso
+        e nada e enviado.
       </p>
 
-      <h4>Placeholders do template</h4>
+      <h4>Template</h4>
       <p>
-        O campo HTML do template (<code>x_body</code>) aceita marcadores no formato
-        <code>{campo}</code>, onde <code>campo</code> e o <b>nome tecnico de um campo de
-        res.partner</b>. Exemplo: <code>Ola {name}, seu email e {email}.</code>
+        Vem da campanha (<code>x_template_id</code>). Se o campo "WhatsApp Template"
+        desta acao estiver preenchido, ele sobrepoe o da campanha (uso de teste).
       </p>
-      <p>Como cada tipo e convertido:</p>
+      <p>
+        O corpo (<code>x_body</code>) usa marcadores <code>{{campo}}</code>, onde
+        <code>campo</code> e o <b>nome tecnico de um campo de res.partner</b>.
+        Exemplo: <code>Ola {{name}}, seu email e {{email}}.</code>
+        O HTML do editor e convertido para texto puro antes de ir para <code>message</code>.
+      </p>
       <ul>
         <li><b>char / text / number / date</b>: valor convertido para texto.</li>
-        <li><b>many2one</b>: usa o <code>display_name</code> do registro.</li>
+        <li><b>many2one</b>: <code>display_name</code> do registro.</li>
         <li><b>many2many / one2many</b>: <code>display_name</code> de cada registro, separados por virgula.</li>
-        <li><b>vazio / False</b>: vira string vazia.</li>
-        <li><b>campo inexistente em res.partner</b>: o placeholder e mantido literal e um aviso vai para o log.</li>
+        <li><b>vazio / False</b>: string vazia.</li>
+        <li><b>campo inexistente em res.partner</b>: fica fora de <code>params</code>; a API mantem o marcador literal.</li>
       </ul>
-      <p>
-        O valor substituido e escapado automaticamente (o corpo e <code>Markup</code>),
-        entao nome de parceiro com <code>&amp;</code> ou <code>&lt;</code> nao quebra o HTML.
-      </p>
 
-      <h4>Envio: endpoint X</h4>
-      <p>
-        Cada mensagem montada gera um payload com <code>campaign_id</code>,
-        <code>from_number</code>, <code>send_date</code>, <code>template_id</code>,
-        <code>partner_id</code>, <code>to</code> e <code>body_html</code>.
-        Esse payload seria enviado ao <b>endpoint X</b>.
-      </p>
-      <p>
-        <b>Telefone:</b> o destino sai sempre de <code>res.partner.phone</code> — sem
-        fallback para <code>mobile</code>. Parceiro sem <code>phone</code> ainda tem a
-        mensagem montada, com <code>to</code> vazio e um aviso no log.
-      </p>
-      <p>
-        O POST nao acontece dentro desta acao: o <code>safe_eval</code> de server action
-        nao expoe <code>requests</code> nem <code>urllib</code>. Quando o endpoint X for
-        definido, o disparo deve sair de um modulo Python (metodo no HUB ou um
-        <code>ir.cron</code> chamando codigo do addon), lendo os mesmos campos.
-        Enquanto isso a acao so registra o payload no log.
-      </p>
+      <h4>Request montado</h4>
+      <ul>
+        <li><code>POST {base}/send</code>, header <code>Authorization: Bearer &lt;token&gt;</code>.</li>
+        <li><code>message</code>: template em texto puro com <code>{{campo}}</code>.</li>
+        <li><code>content[]</code>: <code>{"number": ..., "params": {...}}</code> por parceiro.</li>
+        <li><b>Numero:</b> sempre <code>res.partner.phone</code>, so digitos; sem DDI (10 ou 11 digitos) recebe <code>55</code>. Parceiro sem phone fica fora do lote (a API recusa o lote inteiro com 400).</li>
+        <li><b>Lotes:</b> ate 1000 destinatarios por request. A API aceita 6 requests por minuto.</li>
+      </ul>
 
-      <h4>Sobre o ID do browse()</h4>
+      <h4>Parametros do sistema</h4>
+      <ul>
+        <li><code>whatsapp_mass.api_token</code>: o <code>x_api_token</code> do numero no HUB (o token define o remetente).</li>
+        <li><code>whatsapp_mass.api_base_url</code>: opcional, default <code>https://zap-odoo-production-1063.up.railway.app</code>.</li>
+      </ul>
+      <p>O token aparece mascarado no log.</p>
+
+      <h4>Status</h4>
       <p>
-        No exemplo de referencia o codigo era
-        <code>env['ir.actions.server'].browse(692)</code> — e <b>692 e o ID desta propria
-        acao de servidor</b>, nao o ID de um template nem de uma campanha: a acao busca a
-        si mesma para ler o template configurado nela. Como o ID gerado no banco so e
-        conhecido depois da instalacao, o codigo usa
-        <code>env.ref('custom_odoo_whatsapp_mass.action_server_whatsapp_test')</code>,
-        que resolve o mesmo registro sem ID fixo.
-      </p>
-      <p>
-        <b>Template:</b> propositalmente vazio. Preencha o campo "WhatsApp Template"
-        antes de rodar, senao a acao so registra que nao ha template definido.
+        Resposta 202 grava <code>sent</code> e o
+        <code>batch_id</code> em <code>x_batch_id</code> (varios lotes: separados por virgula).
+        202 significa aceito na fila da API; o progresso real esta em
+        <code>GET /send/&lt;batch_id&gt;</code>. Qualquer outro HTTP para a acao com erro
+        e desfaz o status (o log do erro permanece).
       </p>
     </field>
     <field name="code"><![CDATA[
-# ---------------------------------------------------------------------------
-# ACAO DE SERVIDOR DE TESTE - Campanhas Whatsapp
-#
-# Regra de negocio:
-#   O corpo HTML do template usa {campo}, onde `campo` e o nome tecnico de um
-#   campo de res.partner. Para cada destinatario da campanha montamos o texto
-#   final e enviamos ao endpoint X (ainda placeholder).
-#
-# Exemplo de referencia do ID:
-#     minha_automacao = env['ir.actions.server'].browse(692)
-#   692 = ID DESTA PROPRIA ACAO. Resolvemos por XML ID para nao depender do ID
-#   gerado no banco. Forma literal equivalente: browse(<ID desta acao>).
-#
-# Limites do safe_eval: sem re / json / requests / urllib. Parser de
-# placeholders feito na mao; POST apenas documentado.
-# ---------------------------------------------------------------------------
+# Envio em Massa WhatsApp -> API ZapOdoo (POST /send).
+# Detalhes da regra no campo "help" desta acao.
 
-# Endpoint de destino. Placeholder ate a definicao do servico real.
-ENDPOINT_X = "x"
+# Configuracao: Configuracoes > Tecnico > Parametros do Sistema
+cfg = env['ir.config_parameter'].sudo()
+base_url = (cfg.get_param('whatsapp_mass.api_base_url') or 'https://zap-odoo-production-1063.up.railway.app').rstrip('/')
+token = cfg.get_param('whatsapp_mass.api_token')
+if not token:
+    raise UserError("Parametro do sistema 'whatsapp_mass.api_token' vazio.")
 
-minha_automacao = env.ref('custom_odoo_whatsapp_mass.action_server_whatsapp_test')
-template = minha_automacao.x_whatsapp_template_id
+# O POST precisa de `requests`; o Odoo padrao (e o Odoo Online) nao o expoe aqui
+try:
+    postar = requests.post
+except Exception:
+    raise UserError("Esta base nao permite HTTP em acao de servidor ('requests' indisponivel).")
 
-if not template:
-    log("[Envio em Massa] Acao ID %s: nenhum template em x_whatsapp_template_id." % minha_automacao.id,
-        level='warning')
-else:
-    # `records` so existe quando a acao roda a partir de uma lista/form de
-    # campanha; `model` e o recordset vazio de x_whatsapp_campaing.
-    campanhas = records or model
+# Template preenchido nesta acao sobrepoe o template da campanha
+template_acao = env.ref('custom_odoo_whatsapp_mass.action_server_whatsapp_test').x_whatsapp_template_id
 
-    if not campanhas:
-        log("[Envio em Massa] Acao ID %s: rodou sem campanha selecionada, nada a montar."
-            % minha_automacao.id, level='warning')
+# Campos de res.partner, usados para validar os marcadores {{campo}}
+campos_partner = env['res.partner'].fields_get()
 
-    # Metadados de res.partner: usados para validar o placeholder e saber o
-    # tipo do campo. `nome in campos_partner` evita tocar em _fields (o
-    # safe_eval bloqueia atributos com underscore).
-    campos_partner = env['res.partner'].fields_get()
-    corpo = template.x_body or ''
+for campanha in records:
+    template = template_acao or campanha.x_template_id
 
-    for campanha in campanhas:
-        montadas = 0
+    # x_body e HTML: quebras de bloco viram nova linha e as tags saem
+    bruto = str(template.x_body or '')
+    for tag in ('<br>', '<br/>', '<br />', '</p>', '</div>', '</li>'):
+        bruto = bruto.replace(tag, '\n')
+    mensagem = ''
+    dentro_tag = False
+    for char in bruto:
+        if char == '<':
+            dentro_tag = True
+        elif char == '>':
+            dentro_tag = False
+        elif not dentro_tag:
+            mensagem += char
+    for entidade, troca in (('&nbsp;', ' '), ('&lt;', '<'), ('&gt;', '>'),
+                            ('&quot;', '"'), ('&#39;', "'"), ('&amp;', '&')):
+        mensagem = mensagem.replace(entidade, troca)
+    mensagem = mensagem.strip()
+    # Template vazio: a API recusaria, pula a campanha
+    if not mensagem:
+        continue
 
-        for parceiro in campanha.x_partner_ids:
-            # ---- parser de {campo} sem regex -------------------------------
-            partes = corpo.split('{')
-            texto = partes[0]
+    # Marcadores {{campo}}: normaliza "{{ campo }}" para "{{campo}}" e guarda
+    # so os que existem em res.partner (os demais a API mantem literais)
+    partes = mensagem.split('{{')
+    mensagem = partes[0]
+    nomes_campos = []
+    for parte in partes[1:]:
+        if '}}' not in parte:
+            mensagem += '{{' + parte
+            continue
+        chave, resto = parte.split('}}', 1)
+        nome_campo = chave.strip()
+        mensagem += '{{' + nome_campo + '}}' + resto
+        if nome_campo in campos_partner and nome_campo not in nomes_campos:
+            nomes_campos.append(nome_campo)
 
-            for parte in partes[1:]:
-                if '}' not in parte:
-                    # chave sem fechamento: mantem literal
-                    texto += '{' + parte
-                    continue
+    # Um item {number, params} por parceiro
+    conteudo = []
+    for parceiro in campanha.x_partner_ids:
+        # Numero: so os digitos de res.partner.phone
+        numero = ''
+        for char in parceiro.phone or '':
+            if char in '0123456789':
+                numero += char
+        # Sem telefone fica fora (a API recusaria o lote inteiro)
+        if not numero:
+            continue
+        # Sem DDI (10 ou 11 digitos): prefixa 55 (Brasil)
+        if len(numero) <= 11:
+            numero = '55' + numero
 
-                chave, resto = parte.split('}', 1)
-                nome_campo = chave.strip()
+        # Valor de cada campo do template, sempre como texto
+        params = {}
+        for nome_campo in nomes_campos:
+            valor = parceiro[nome_campo]
+            tipo = campos_partner[nome_campo]['type']
+            if not valor:
+                valor = ''
+            elif tipo == 'many2one':
+                valor = valor.display_name
+            elif tipo in ('many2many', 'one2many'):
+                valor = ', '.join(valor.mapped('display_name'))
+            else:
+                valor = str(valor)
+            params[nome_campo] = valor
 
-                if nome_campo not in campos_partner:
-                    log("[Envio em Massa] Placeholder '{%s}' ignorado: campo inexistente em res.partner."
-                        % nome_campo, level='warning')
-                    texto += '{' + parte
-                    continue
+        item = {'number': numero}
+        if params:
+            item['params'] = params
+        conteudo.append(item)
 
-                valor = parceiro[nome_campo]
-                tipo = campos_partner[nome_campo]['type']
+    # Nenhum parceiro com telefone: nada a enviar nesta campanha
+    if not conteudo:
+        continue
 
-                if not valor:
-                    valor = ''
-                elif tipo == 'many2one':
-                    valor = valor.display_name
-                elif tipo in ('many2many', 'one2many'):
-                    valor = ', '.join(valor.mapped('display_name'))
-                else:
-                    valor = str(valor)
+    # Envio: a API aceita ate 1000 destinatarios por request
+    batch_ids = []
+    for inicio in range(0, len(conteudo), 1000):
+        resposta = postar(
+            base_url + '/send',
+            json={'message': mensagem, 'content': conteudo[inicio:inicio + 1000]},
+            headers={'Authorization': 'Bearer ' + token},
+            timeout=30,
+        )
+        # 202 = aceito na fila; qualquer outro codigo para a acao e desfaz tudo
+        if resposta.status_code != 202:
+            log("Campanha '%s': HTTP %s -> %s" % (campanha.x_name, resposta.status_code, resposta.text),
+                level='error')
+            raise UserError("Falha no envio da campanha '%s'.\nHTTP %s\n%s"
+                            % (campanha.x_name, resposta.status_code, resposta.text))
+        batch_ids.append(resposta.json().get('batch_id') or '')
 
-                # `texto` e Markup (campo html) -> o valor injetado e escapado
-                # automaticamente; `resto` segue como Markup e nao e escapado.
-                texto += valor + resto
-            # ----------------------------------------------------------------
-
-            # Telefone: sempre res.partner.phone. Sem fallback para mobile.
-            destino = parceiro.phone or ''
-            if not destino:
-                log("[Envio em Massa] Parceiro '%s' (id %s) sem phone: mensagem montada sem destino."
-                    % (parceiro.display_name, parceiro.id), level='warning')
-
-            payload = {
-                'campaign_id': campanha.id,
-                'campaign': campanha.x_name,
-                'from_number': campanha.x_number or '',
-                'send_date': str(campanha.x_send_date or ''),
-                'template_id': template.id,
-                'partner_id': parceiro.id,
-                'to': destino,
-                'body_html': str(texto),
-            }
-
-            # TODO endpoint X: o POST nao roda aqui (safe_eval nao expoe
-            # requests/urllib). Quando o endpoint estiver definido, mover o
-            # disparo para codigo Python do addon / HUB, consumindo este mesmo
-            # payload. Por ora so registramos o que seria enviado.
-            log("[Envio em Massa] POST %s -> %s" % (ENDPOINT_X, payload))
-            montadas += 1
-
-        log("[Envio em Massa] Campanha '%s' (id %s): %s mensagem(ns) montada(s) para o endpoint '%s'."
-            % (campanha.x_name, campanha.id, montadas, ENDPOINT_X))
-
-        # TODO status: com o envio real, gravar x_status = 'processing' antes do
-        # POST e 'sent' / 'error' conforme a resposta do endpoint X. A acao de
-        # teste nao altera status porque nao envia de fato.
+    # batch_id serve para acompanhar o progresso em GET /send/<batch_id>
+    campanha.write({'x_status': 'sent', 'x_batch_id': ','.join(batch_ids)})
+    log("Campanha '%s': %s destinatario(s) enviados, batch_id %s"
+        % (campanha.x_name, len(conteudo), ','.join(batch_ids)))
 ]]></field>
   </record>
 </odoo>

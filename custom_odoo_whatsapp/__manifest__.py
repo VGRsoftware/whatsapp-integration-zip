@@ -13,16 +13,16 @@ Main Features
 * Toggle between Odoo chatter and WhatsApp conversation.
 * Display WhatsApp messages inside supported documents.
 * Improved communication workflow.
-* Native integration with CRM and Sales.
+* Native integration with CRM, Sales, Helpdesk, Project tasks, Contacts and Invoices.
 * Designed for a seamless user experience.
 
 This module is proprietary software and is licensed under OPL-1.
     """,
     "author": "VGR",
     # Sem prefixo de serie: o Odoo prefixa a serie corrente automaticamente
-    # (adapt_version). Fixar "19.0.x" faz check_version() falhar no saas~19.4
+    # (adapt_version). Fixar "19.0.x" faz check_version() falhar no Odoo 20
     # e o modulo ser marcado installable=False na importacao.
-    "version": "1.2.1",
+    "version": "1.4.0",
     "license": "OPL-1",
     "category": "Productivity/Discuss",
     "icon": "/custom_odoo_whatsapp/static/description/icon.png",
@@ -30,7 +30,7 @@ This module is proprietary software and is licensed under OPL-1.
         "static/description/banner.png",
         "static/description/icon.png",
     ],
-    "depends": ["crm", "sale_management"],
+    "depends": ["crm", "sale_management", "helpdesk", "project", "contacts", "account"],
     "data": [
         "models/models.xml",
         "models/whatsapp_models.xml",

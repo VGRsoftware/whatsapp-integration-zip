@@ -2,31 +2,31 @@
 <templates xml:space="preserve">
 
   <!--
-    Odoo 19.4 (saas~19.4) usa OWL 3 via camada de compatibilidade:
+    Odoo 20 (OWL 3):
       * expressoes de template exigem prefixo `this.`
-      * `t-ref` com nome em string virou `t-custom-ref`
+      * `t-ref` aponta para um signal.ref do componente (`t-ref="this.zapPanelRef"`);
+        `t-custom-ref` nao existe mais
       * a prop `record` do chatter fica em `this.webChatterProps`, nao em `props`
-    Nao colocamos ref nas divs nativas (o-mail-Chatter-top/-content) porque a
-    o-mail-Chatter-top ja possui `t-custom-ref="top"` usado pelo core; sobrescrever
-    quebraria o chatter. O JS localiza as divs a partir do proprio painel.
+    Nao colocamos ref nas divs nativas (o-mail-Chatter-top/-content) para nao
+    interferir nos refs do core. O JS localiza as divs a partir do proprio painel.
   -->
   <t t-inherit="mail.Chatter" t-inherit-mode="extension">
 
     <xpath expr="//div[hasclass('o-mail-Chatter-top')]" position="before">
-      <t t-if="this.webChatterProps.record and (this.webChatterProps.record.resModel === 'crm.lead' or this.webChatterProps.record.resModel === 'sale.order')">
-        <div class="o-chatter-zap-toggle d-flex mx-2 mt-2">
+      <t t-if="this.webChatterProps.record and this.zapModels.includes(this.webChatterProps.record.resModel)">
+        <div class="o-chatter-zap-toggle d-flex">
 
-          <button t-custom-ref="chatterBtn"
+          <button t-ref="this.zapChatterBtnRef"
             class="btn flex-fill btn-secondary o_zap_btn_chatter"
             t-on-click="() => this.zapToggle('chatter')"
           >Chatter</button>
-          <button t-custom-ref="zapBtn"
+          <button t-ref="this.zapBtnRef"
             class="btn flex-fill btn-primary o_zap_btn_iframe"
             t-on-click="() => this.zapToggle('zap')"
           >WhatsApp</button>
         </div>
 
-        <div t-custom-ref="zap" class="o-chatter-zap-panel hidden px-2 pb-2 mt-2"
+        <div t-ref="this.zapPanelRef" class="o-chatter-zap-panel hidden px-2 pb-2 mt-2"
           style="width:100%; height:100%; min-height: 500px; overflow:hidden;">
           <iframe t-att-src="this.webChatterProps.record.data.x_iframe"
             style="width:100%; min-height: 600px; height:100%; border-radius:6px; border: #262A36 solid 1px" />
