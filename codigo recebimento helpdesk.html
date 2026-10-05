@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="pt-BR">
+<head><meta charset="utf-8"><title>WhatsApp → Helpdesk</title></head>
+<body>
+<h1>WhatsApp → Helpdesk: abertura automática de tickets</h1>
+<blockquote>Toda mensagem WhatsApp recebida verifica se o contato já tem um ticket aberto. Se não tiver, um novo ticket é criado no Helpdesk, já vinculado ao contato.</blockquote>
+
+<h2>⚙️ Configuração da automação</h2>
+<p>Caminho: <b>Configurações → Técnico → Automações → Novo</b></p>
+<table border="1" cellpadding="6" style="border-collapse:collapse">
+<tr><th>Campo</th><th>Valor</th></tr>
+<tr><td><b>Modelo</b></td><td>Zap Messages (<code>x_whatsapp_messages</code>)</td></tr>
+<tr><td><b>Gatilho</b></td><td>Na criação</td></tr>
+<tr><td><b>Filtro</b></td><td><code>[("x_direction", "=", "in")]</code></td></tr>
+<tr><td><b>Ação</b></td><td>Executar código Python</td></tr>
+</table>
+
+<h2>🔄 Como funciona</h2>
+<ol>
+<li>Uma mensagem do tipo <b>recebida</b> (<code>in</code>) chega no Odoo.</li>
+<li>O Odoo procura o <b>contato</b> cujo telefone corresponde ao número completo da mensagem, com código do país. A formatação é ignorada.</li>
+<li>Se o contato <b>já tem ticket aberto</b>, nada é feito.</li>
+<li>Se <b>não tem ticket aberto</b> (nenhum ticket, ou só tickets fechados): cria o ticket <b>Whats - Novo contato</b>, vincula o contato e coloca a mensagem recebida na descrição.</li>
+<li>Se o <b>contato não existe</b>, primeiro é criado o contato <b>Whats Novo</b> com o número recebido. Esse contato é vinculado ao novo ticket.</li>
+</ol>
+<table border="1" cellpadding="6" style="border-collapse:collapse">
+<tr><th>Situação</th><th>Resultado</th></tr>
+<tr><td>Contato com ticket aberto</td><td>Nada acontece</td></tr>
+<tr><td>Contato sem ticket, ou só com tickets fechados</td><td>Novo ticket vinculado ao contato</td></tr>
+<tr><td>Número sem contato cadastrado</td><td>Novo contato <b>Whats Novo</b> + novo ticket</td></tr>
+</table>
+
+<h2>🐍 Código Python</h2>
+<pre><code>for msg in records:
+    number = (msg.x_jid or '').split('@')[0]
+
+    # Contato com o número completo (com código do país), ignorando formatação
+    partners = env['res.partner'].sudo().search([('phone', 'ilike', number[-4:])]).filtered(
+        lambda p: ''.join(c for c in p.phone if c.isdigit()) == number
+    )
+
+    # Já existe ticket aberto para o contato -&gt; não faz nada
+    if partners and env['helpdesk.ticket'].sudo().search_count([
+        ('partner_id', 'in', partners.ids),
+        ('stage_id.fold', '=', False),
+    ]):
+        continue
+
+    # Sem contato cadastrado -&gt; cria um
+    if not partners:
+        partners = env['res.partner'].sudo().create({
+            'name': 'Whats Novo',
+            'phone': '+' + number,
+        })
+
+    env['helpdesk.ticket'].sudo().create({
+        'name': 'Whats - Novo contato',
+        'partner_id': partners[0].id,
+        'description': msg.x_message,
+    })</code></pre>
+
+<h2>⚠️ Pontos de atenção</h2>
+<ul>
+<li><b>Telefone com código do país:</b> o contato precisa estar salvo com o DDI. Exemplo: <code>+55 41 99779-5287</code>.</li>
+<li><b>9º dígito:</b> alguns números chegam do WhatsApp sem o 9 (<code>554197795287</code>). Nesse caso o número não casa com o contato salvo com o 9, e a automação cria um contato <b>Whats Novo</b> duplicado.</li>
+<li><b>Ticket fechado:</b> o ticket só conta como fechado se o estágio tiver a opção <b>Dobrado no Kanban</b> marcada (ex.: <i>Resolvido</i>, <i>Cancelado</i>). Um estágio de encerramento sem essa opção é tratado como aberto.</li>
+</ul>
+</body>
+</html>
